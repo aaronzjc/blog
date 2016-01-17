@@ -8,7 +8,7 @@
 # Site settings
 title: 张进程
 email: 415397228@qq.com
-description: > 个人博客
+description: > # 个人博客
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://yourdomain.com" # the base hostname & protocol for your site
 twitter_username: 不害羞滴含羞草
