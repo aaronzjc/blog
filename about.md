@@ -4,12 +4,9 @@ title: About
 permalink: /about/
 ---
 
-This is the base Jekyll theme. You can find out more info about customizing your Jekyll theme, as well as basic Jekyll usage documentation at [jekyllrb.com](http://jekyllrb.com/)
+现在在北京一家互联网公司做PHP开发。
 
-You can find the source code for the Jekyll new theme at:
-{% include icon-github.html username="jglovier" %} /
-[jekyll-new](https://github.com/jglovier/jekyll-new)
+喜欢很简单的生活。周末心情好就会出去逛逛，感受北京的面貌。心情不好也会出去逛逛，逛着逛着就心情平静了。心情不好也不坏的时候就会宅家里，写代码
+看视频，发呆，发呆。
 
-You can find the source code for Jekyll at
-{% include icon-github.html username="jekyll" %} /
-[jekyll](https://github.com/jekyll/jekyll)
+对有趣的技术有很强的好奇心。谦虚。善良。
