@@ -11,7 +11,7 @@ dl, dd, ol, ul, figure {
  * Basic styling
  */
 body {
-  font: 300 16px/1.5 Helvetica, "Helvetica Neue", consolas, Arial, sans-serif;
+  font: 300 15px/1.5 Helvetica, "Helvetica Neue", consolas, Arial, sans-serif;
   color: #111;
   background-color: #fdfdfd;
   -webkit-text-size-adjust: 100%;
@@ -44,7 +44,7 @@ figure > img {
   display: block; }
 
 figcaption {
-  font-size: 14px; }
+  font-size: 13.125px; }
 
 /**
  * Lists
@@ -95,7 +95,7 @@ code {
   font-size: 12px;
   border: 1px solid #e8e8e8;
   border-radius: 3px;
-  background-color: #eef;
+  background-color: #f1f3f7;
   font-family: monaco, monospace; }
 
 code {
@@ -274,10 +274,10 @@ pre {
   margin-left: 0;
   list-style: none; }
   .post-list > li {
-    margin-bottom: 30px; }
+    margin-bottom: 15px; }
 
 .post-meta {
-  font-size: 14px;
+  font-size: 13.125px;
   color: #828282; }
 
 .post-link {
@@ -291,7 +291,7 @@ pre {
   margin-bottom: 30px; }
 
 .post-title {
-  font-size: 42px;
+  font-size: 36px;
   letter-spacing: -1px;
   line-height: 1; }
   @media screen and (max-width: 800px) {
@@ -301,17 +301,17 @@ pre {
 .post-content {
   margin-bottom: 30px; }
   .post-content h2 {
-    font-size: 32px; }
+    font-size: 26px; }
     @media screen and (max-width: 800px) {
       .post-content h2 {
-        font-size: 28px; } }
+        font-size: 26px; } }
   .post-content h3 {
-    font-size: 26px; }
+    font-size: 22px; }
     @media screen and (max-width: 800px) {
       .post-content h3 {
         font-size: 22px; } }
   .post-content h4 {
-    font-size: 20px; }
+    font-size: 18px; }
     @media screen and (max-width: 800px) {
       .post-content h4 {
         font-size: 18px; } }
