@@ -11,7 +11,7 @@ dl, dd, ol, ul, figure {
  * Basic styling
  */
 body {
-  font: 400 16px/1.5 "Helvetica Neue", consolas, Helvetica, Arial, sans-serif;
+  font: 300 16px/1.5 Helvetica, "Helvetica Neue", consolas, Arial, sans-serif;
   color: #111;
   background-color: #fdfdfd;
   -webkit-text-size-adjust: 100%;
@@ -60,7 +60,7 @@ li > ol {
  * Headings
  */
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 400; }
+  font-weight: 300; }
 
 /**
  * Links
@@ -92,10 +92,11 @@ blockquote {
  */
 pre,
 code {
-  font-size: 15px;
+  font-size: 12px;
   border: 1px solid #e8e8e8;
   border-radius: 3px;
-  background-color: #eef; }
+  background-color: #eef;
+  font-family: monaco, monospace; }
 
 code {
   padding: 1px 5px; }
