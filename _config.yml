@@ -15,5 +15,12 @@ url: "http://memosa.xyz/" # the base hostname & protocol for your site
 twitter_username: 不害羞滴含羞草
 github_username:  aaronzjc
 
+# gem files
+gems: [jekyll-paginate]
+
 # Build settings
 markdown: kramdown
+
+# pagination
+paginate: 10
+paginate_path: "/blog/page:num/"

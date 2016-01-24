@@ -4,19 +4,36 @@ layout: default
 
 <div class="home">
 
-  <h1 class="page-heading">归档</h1>
+    <h1 class="page-heading">归档</h1>
 
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-      </li>
-    {% endfor %}
-  </ul>
+    <ul class="post-list">
+        {% for post in paginator.posts %}
+        <li>
+            <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+            <h2>
+                <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+            </h2>
+        </li>
+        {% endfor %}
+    </ul>
 
-  <!-- <p class="rss-subscribe">订阅 <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p> -->
+    <!-- Pagination links -->
+    {% if paginator.total_pages > 1%}
+    <div class="pagination">
+        {% if paginator.previous_page %}
+        <a href="{{ paginator.previous_page_path }}" class="previous"><=</a>
+        {% else %}
+        <span class="previous"><=</span>
+        {% endif %}
+        <span class="page_number ">{{ paginator.page }} - {{ paginator.total_pages }}</span>
+        {% if paginator.next_page %}
+        <a href="{{ paginator.next_page_path }}" class="next">=></a>
+        {% else %}
+        <span class="next ">=></span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- <p class="rss-subscribe">订阅 <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p> -->
 
 </div>
