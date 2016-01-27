@@ -27,7 +27,7 @@ categories: php
 array array_map(callback $callback, array $array1[, array $...])
 {% endhighlight %}
 参数
-{% highlight txt %}
+{% highlight php %}
 callback
 回调函数
 
@@ -52,7 +52,7 @@ mixed array_reduce(array $arr, callback $callback [, mixed $initial])
 该函数，迭代的将回调函数应用于数组中的每一个元素进行计算，最后返回一个单一的值。说到这里还是很迷惑，下面会具体分析。
 
 参数
-{% highlight txt %}
+{% highlight php %}
 array
 数组
 
