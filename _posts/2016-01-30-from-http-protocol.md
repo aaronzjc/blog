@@ -86,4 +86,3 @@ CGI(Common Gateway Interface)通用网关接口。描述了外部应用程序与
 
 * 《图解HTTP》
 * [Apache CGI文档说明](https://httpd.apache.org/docs/2.2/howto/cgi.html)
-*
