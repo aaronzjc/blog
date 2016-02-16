@@ -10,6 +10,7 @@ categories: php
 * [array_reduce](#arrayreduce)
 * [array_slice](#arrayslice)
 * [array_pop](#arraypop)
+* [array_replace](#arrayreplace)
 * [array_flip](#arrayflip)
 * [array_keys](#arraykeys)
 * [array_rand](#arrayrand)
@@ -97,6 +98,20 @@ print_r(array_slice($arr, -2, 1)); /* [4] */
 mixed array_pop ( array &$array )
 {% endhighlight %}
 返回数组的最后一个元素，这里使用的是引用，所以数组会改变。与之相对应得是array_shift。
+
+### array_replace
+{% highlight php %}
+array array_replace ( array $array1 , array $array2 [, array $... ] )
+{% endhighlight %}
+根据$array2, $array3数组中的内容来替换$array1中的内容。规则为，如果$array1中的元素存在于$array2中，则用$array2的元素替换；如果，$array1中的元素不存在$array2中，则保留不变；如果$array2中的元素不存在于$array1中，则在$array1中创建这么一个元素。
+示例
+{% highlight php %}
+<?php
+$base = ['a' => 'b', 'b' => 'c'];
+$replace = ['a' => 'a', 'c' => 'd'];
+$base = array_replace($base, $replace);
+print_r($base)  /* ['a' => 'a', 'b' => 'c', 'c' => 'd'] */
+{% endhighlight %}
 
 ### array_flip
 {% highlight php %}
