@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "PHP通过JSON传递JS函数"
-date:   2016-02-19 10:00:00 +0800
+date:   2016-02-19 12:00:00 +0800
 categories: web
 ---
 在做PECharts开发时，遇到一个问题，就是如何传递JS函数。ECharts的option中有些选项可以配置匿名函数，作为一个后端封装，也应该提供这样的方式来让开发者者在后端传递function。然后再说遇到的问题。
