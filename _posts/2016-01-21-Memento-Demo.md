@@ -2,7 +2,7 @@
 layout: post
 title: "设计模式-备忘录模式"
 date:   2016-01-21 15:42:00 +0800
-categories: web 技能
+categories: web
 ---
 ## 前言
 
