@@ -123,7 +123,6 @@ blockquote {
     border-left: 4px solid $grey-color-light;
     padding-left: $spacing-unit / 2;
     font-size: 14px;
-    letter-spacing: -1px;
     font-style: normal;
 
     > :last-child {
@@ -237,3 +236,12 @@ pre {
  .pagination {
      text-align: center;
  }
+
+ /**
+  * blockquote p
+  */
+  blockquote p {
+      letter-spacing: 0px;
+      margin-bottom: 5px;
+      font-family: monaco, monospace;
+  }
