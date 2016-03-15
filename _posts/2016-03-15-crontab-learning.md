@@ -50,16 +50,22 @@ crontab使用*和数字来指定时间，图片解释了每个时间的取值。
 
 ## 使用
 打开终端，输入`crontab -e`，编辑crontab任务。保存后，会出现，`crontab installing new crontab`，表示新建成功。
+
 ![crontab_use]({{ site.url }}/assert/imgs/crontab_2.png)
+
 这里，我新建的任务是，列出目录至ls.log文件。
 {% highlight shell %}
 * * * * * ls > /tmp/
 {% endhighlight %}
 查看当前用户的任务列表, 以及删除任务。
+
 ![crontab_l]({{ site.url }}/assert/imgs/crontab_4.png)
+
 值得注意的是，当有crontab任务执行了，执行后会发送一封邮件给用户。
+
 ![crontab_mail]({{ site.url }}/assert/imgs/crontab_3.png)
+
 可以打开`/var/mail/{$user_name}`查看，也可以使用命令`mail`来查看。
 
 ## 后续
-后台定时任务管理系统。
+后台定时任务管理。
