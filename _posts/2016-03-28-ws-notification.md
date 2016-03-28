@@ -36,6 +36,7 @@ Redis的PUB/SUB功能:
 > Client2: PUBLISH TEST "hello redis"  # 发布消息到频道
 
 测试如下:
+
 ![redi]({{ site.url }}/assert/imgs/redis_subpub.png)
 
 ### Laravel发布通知
@@ -155,6 +156,7 @@ socket.onclose = function(event) {
 ### Demo展示
 
 下面是最终的效果。点击发送时，系统生成0-10的随机数，然后发送到Redis，最后通过Websocket服务器通知客户端。更新右上角的数字。
+
 ![push_demo]({{ site.url }}/assert/imgs/push_demo.png)
 
 ## 最后
