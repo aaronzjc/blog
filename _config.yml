@@ -10,8 +10,8 @@ title: 张进程
 email: 415397228@qq.com
 description: > # 个人博客
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "http://memosa.xyz/" # the base hostname & protocol for your site
-#url: "http:/localhost:4000"
+url: "http://memosa.xyz/"  #the base hostname & protocol for your site
+# url: "http:/localhost:4000"
 twitter_username: 不害羞滴含羞草
 github_username:  aaronzjc
 
