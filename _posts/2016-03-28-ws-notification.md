@@ -33,7 +33,7 @@ Redis的PUB/SUB功能:
 >
 > Client1: SUBCRIBE TEST  # 订阅频道
 >
-> Client2: PUBLISH TEST 'hello redi'  # 发布消息到频道
+> Client2: PUBLISH TEST "hello redis"  # 发布消息到频道
 
 测试如下:
 ![redi]({{ site.url }}/assert/imgs/redis_subpub.png)
