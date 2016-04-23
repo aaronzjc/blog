@@ -1,57 +1,24 @@
 ---
 layout: post
-title: "Laravel中使用Websocket推送通知"
-date:   2016-03-28 10:00:00 +0800
+title: "PHP使用Websocket推送通知"
+date:   2016-04-23 10:00:00 +0800
 categories: web
 ---
 ## 概述
-之前在工作时，对新浪微博的消息通知很感兴趣。然后，自己后来断断续续了解了这一块的相关知识。现在，在使用Laravel搭建后台项目的时候，想到这么个点。就应用了一下。推送技术主要是通过Websocket，来达到客户端和服务器的通信。服务器有消息了，主动发送消息给浏览器，浏览器在接收消息的事件中进行响应处理发送通知。另一个比较重要的点就是，消息一般是我们的应用程序产生的，但是和浏览器通信的是Websocket服务器。应用程序和Websocket服务器之间也需要通信。
+系统开发中，实时消息推送是一个很常见的需求。整体过程而言也没有那么复杂,如果不考虑实时性和性能这些，更简单，客户端轮询服务器的消息表即可。建立Web实时通信和传统通信不同的是，因为浏览器和http服务器之间不能进行双向通信，所以需要借助Websocket这么一个桥梁来连接两者。用户的应用产生消息之后，首先发送给Websocket服务器，Websocket服务器收到消息，再发送给已经建立连接的客户端。
 
-应用程序和Websocket服务器通信使用的是Redis的PUB/SUB功能。PUB/SUB，即发布/订阅。消费者订阅一定的频道，然后发布者有消息时，发布消息到指定的频道上，对应订阅该频道的消费者即可接收到发布的消息。
-
-最后，整个大致流程图如下
+大致过程如下：
 
 ![ws]({{ site.url }}/assert/imgs/ws_push_main.png)
 
 整个过程可以简化为:
 
 * 前端页面初始化，连接到Websocket服务器
-* Websocket服务器在接受连接时，根据连接的用户订阅指定的频道，例如{user:123}
-* 应用程序产生通知，发布消息到{user:123}频道
-* Websocket服务器接收到订阅的消息通知，推送给浏览器
-* 浏览器接收到通知，进行处理
+* 应用程序产生通知，连接Websocket服务器，发送消息
+* Websocket服务器接收到应用程序发送的消息，转发给浏览器
+* 浏览器接收到通知，进行页面响应
 
 ## 推送Demo
-
-### Redis
-
-[Redis](http://redis.io/) 是一个开源（BSD许可）的，内存中的数据结构存储系统，它可以用作数据库、缓存和消息中间件。内置了丰富的数据结构和方便的功能操作。
-
-Redis的PUB/SUB功能:
-
-> SUB/PUB
->
-> Client1: SUBCRIBE TEST  # 订阅频道
->
-> Client2: PUBLISH TEST "hello redis"  # 发布消息到频道
-
-测试如下:
-
-![redi]({{ site.url }}/assert/imgs/redis_subpub.png)
-
-### Laravel发布通知
-Laravel应用需要首先安装Predis包：
-{% highlight shell %}
-$ composer require predis/predis
-{% endhighlight %}
-后台消息部分，这里随机一个0-10的数字，然后发布到Redis频道
-{% highlight php %}
-<?php
-// ...
-$cnt = rand(0,10);
-Redis::publish('push:message:1', json_encode(['cnt' => $cnt], JSON_UNESCAPED_UNICODE));
-// ...
-{% endhighlight %}
 
 ### Websocket服务器
 
@@ -60,74 +27,42 @@ Redis::publish('push:message:1', json_encode(['cnt' => $cnt], JSON_UNESCAPED_UNI
 {% highlight shell %}
 $ php artisan make:command SwooleServer
 {% endhighlight %}
-Swoole服务器在启动时，监听客户端的连接事件，客户端连接时，订阅对应频道消息：
+服务器端值得注意的是，需要用到一个全局的数据结构来管理用户，和用户的连接，当用户刷新浏览器之后，需要更新一下用户key绑定的连接符。这样，当消息再次到达时，能够准确的发送出去。
 {% highlight php %}
 <?php
 
-namespace App\Console\Commands;
+$server = new Server('0.0.0.0', 9501);
 
-use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Redis;
-use Swoole\Websocket\Server;
+$table = new Table(1024);
+$table->column('uid', Table::TYPE_INT);
+$table->column('fd', Table::TYPE_INT);
+$table->create();
 
-class SwooleServer extends Command
-{
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'swoole:server';
+$server->table = $table;
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'websocket server using swoole';
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
+$server->on('open', function (Server $server, $request){
+    echo "connected\n";
+    if (isset($request->get['uid'])) {
+        $uid = $request->get['uid'];
+        $server->table->set($uid, ['uid' => $uid, 'fd' => $request->fd]);
     }
+});
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
-    public function handle()
-    {
-        // start a server
-        $server = new Server('0.0.0.0', 9501);
-
-        $server->on('open', function (Server $server, $request){
-            $uid = $request->fd;
-            //subscribe messages from redis
-            Redis::subscribe(['push:message:1'], function($message) use($server, $uid) {
-                echo "notify: ".$message."\n";
-                $server->push($uid, $message);
-            });
-        });
-
-        $server->on('message', function(Server $server, $frame) {
-            echo "received from {$frame->fd}:{$frame->data}\n";
-            $server->push($frame->fd, 'welcome, i heard you.');
-        });
-
-        $server->on('close', function($ser, $fd){
-            echo "client {$fd} closed\n";
-        });
-
-        $server->start();
-
+$server->on('message', function(Server $server, $frame) {
+    echo "received from {$frame->fd}:{$frame->data}\n";
+    $msg = json_decode($frame->data, true);
+    $user = $server->table->get($msg['user_id']);
+    if ($user) {
+        $server->push($user['fd'], $frame->data);
     }
-}
+});
+
+$server->on('close', function($server, $fd){
+    echo "client {$fd} closed\n";
+    $server->table->del($this->user);
+});
+
+$server->start();
 {% endhighlight %}
 
 ### 客户端
@@ -153,17 +88,23 @@ socket.onclose = function(event) {
 }
 {% endhighlight %}
 
+### PHP应用程序
+
+PHP应用程序产生消息之后，需要发送给Websocket服务器。这里说个插曲，之前关于这块，看的是网上的例子，使用Redis来连接应用程序和WS服务器通信。但是他们的WS服务器使用的是Node。我在使用Redis和Swoole这个干时，错误了。因为Redis的订阅操作是阻塞的，所以Swoole不能这么干。
+
+PHP发送消息需要用到PHP的Websocket客户端库来连接，发送消息。有些实现很简单，这里我使用的是这个库[websocket-php](https://github.com/Textalk/websocket-php)。发送消息代码：
+
+{% highlight php %}
+<?php
+$cli = new WebsocketClient('ws://localhost:9501');
+if (!$cli) {echo 'Connect Error!';exit;}
+$cli->send(json_encode($msg->toArray(), JSON_UNESCAPED_UNICODE));
+{% endhighlight %}
+
 ### Demo展示
 
-下面是最终的效果。点击发送时，系统生成0-10的随机数，然后发送到Redis，最后通过Websocket服务器通知客户端。更新右上角的数字。
-
-![push_demo]({{ site.url }}/assert/imgs/push_demo.png)
+略
 
 ## 最后
 
-这里，做到这里就实现了一个基本的Demo了。但是实际的应用中，还是远远不够的。对比微博的功能，应该能够实现消息通知之后，如果用户没有查看的话，应该能够在下次登录时继续显示，等。还得慢慢学习了。
-
-## 参考资料
-
-* [Laravel Redis](https://laravel.com/docs/5.2/redis)
-* [在 laravel 5 實作瀏覽器推播通知](http://jigsawye.com/2015/12/22/push-notification-to-user-in-laravel-5/)
+在折腾完整个过程之后，深刻的理解到，整个东西其实并不是很复杂。需要捋清楚整个两端过程。
