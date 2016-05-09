@@ -5,4 +5,4 @@ permalink: /ideas/
 ---
 
 * [ST3主题切换](https://github.com/aaronzjc/Personal_Toys/tree/master/Sublime)
-* [\<Silicon Valley\> Tracker](https://github.com/aaronzjc/Personal_Toys/tree/master/SeriesNotify)
+* [&lt;Silicon Valley&gt; Tracker](https://github.com/aaronzjc/Personal_Toys/tree/master/SeriesNotify)
