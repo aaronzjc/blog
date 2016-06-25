@@ -45,7 +45,7 @@ cd /WORK
 mkdir test
 cd test
 git clone /WORK/git.git ./
-{% endhighlight %
+{% endhighlight %}
 最后，配置Apache指向创建的test目录，然后访问域名`test.memosa.xyz`即可访问到index.php的内容了。到这里，我们就算是搭建好了一个Git服务器了。
 
 但是仅仅做到这一步依然不够，自己实际开发中，发现有两个地方还是不方便的。第一，我本地修改了项目之后，并不能直接同步到test目录。也就是还得登录更新test目录，才能发布更新；第二，每次在本地git提交的时候，都需要输入ssh的密码，实在不方便，需要配置免密码登陆。
