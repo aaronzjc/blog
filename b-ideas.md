@@ -8,3 +8,4 @@ permalink: /ideas/
 * [&lt;Silicon Valley&gt; Tracker](https://github.com/aaronzjc/Personal_Toys/tree/master/SeriesNotify)
 * [N子棋](https://github.com/aaronzjc/Personal_Toys/tree/master/N%20cheese)
 * [Todo提醒](https://github.com/aaronzjc/Personal_Toys/tree/master/Note)
+* [Vue-Chat](https://github.com/aaronzjc/vue-chat)
