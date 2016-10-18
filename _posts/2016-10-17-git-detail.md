@@ -287,3 +287,9 @@ fix conflicts
 {% endhighlight %}
 
 这里解释下这个目录。试想一下，Git每次都是存储提交的暂存快照。如果，有一个文件特别大。如果每次，都暂存这个文件的快照的话，无疑持续下去，会导致Git本地库越来越大。Git的处理，就是，查找相似的文件，然后只保存文件之间差异的部分。这样，就可以使得文件比较小。pack目录就是存储包文件的。
+
+参考内容
+
+* [《Pro Git第二版》](https://www.gitbook.com/book/bingohuang/progit2/details)
+* [Git 原理](https://chenyiqiao.gitbooks.io/git/content/)
+* [Git 包文件](https://git-scm.com/book/zh/v2/Git-%E5%86%85%E9%83%A8%E5%8E%9F%E7%90%86-%E5%8C%85%E6%96%87%E4%BB%B6)
