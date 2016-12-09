@@ -171,7 +171,7 @@ function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
 }
 {% endhighlight %}
 
-如上，就是递归的整个代码。有一个小坑就是，匿名闭包，那里使用的是`use (&$recursion)`而不是`use ($recursion)`，因为在定义这个函数时，$recursion还是NULL，按照值传递进去是无法执行的。参考这里(StackOverFlow)[http://stackoverflow.com/questions/2480179/anonymous-recursive-php-functions]。
+如上，就是递归的整个代码。有一个小坑就是，匿名闭包，那里使用的是`use (&$recursion)`而不是`use ($recursion)`，因为在定义这个函数时，$recursion还是NULL，按照值传递进去是无法执行的。参考这里[StackOverFlow](http://stackoverflow.com/questions/2480179/anonymous-recursive-php-functions)。
 
 ### 非递归方式
 
