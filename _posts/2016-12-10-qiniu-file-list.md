@@ -30,7 +30,7 @@ $bucketMgr->listFiles($bucket, $prefix, $marker, $limit);
 {% highlight php %}
 <?php
 
-public static function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
+function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
 	$auth = self::getAuth();
 	$bucketMgr = new BucketManager($auth);
 
@@ -82,7 +82,7 @@ public static function listFiles($limit = 200, $prefix = '', $bucket = 'none', $
 {% highlight php %}
 <?php
 
-public static function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs') {
+function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs') {
     $auth = self::getAuth();
     $bucketMgr = new BucketManager($auth);
 
@@ -128,7 +128,7 @@ public static function listFiles($limit = 200, $prefix = '', $marker = '', $buck
 
 {% highlight php %}
 <?php
-public static function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
+function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
 		$auth = self::getAuth();
 		$bucketMgr = new BucketManager($auth);
 
@@ -180,7 +180,7 @@ public static function listFiles($limit = 200, $prefix = '', $bucket = 'none', $
 {% highlight php %}
 <?php
 
-public static function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs') {
+function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs') {
     $auth = self::getAuth();
     $bucketMgr = new BucketManager($auth);
 
