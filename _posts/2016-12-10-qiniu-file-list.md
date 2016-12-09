@@ -31,45 +31,45 @@ $bucketMgr->listFiles($bucket, $prefix, $marker, $limit);
 <?php
 
 public static function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
-		$auth = self::getAuth();
-		$bucketMgr = new BucketManager($auth);
+	$auth = self::getAuth();
+	$bucketMgr = new BucketManager($auth);
 
-		$re = []; // 结果集
+	$re = []; // 结果集
 
-		$option = [
-			'bucket' => $bucket,
-			'prefix' => $prefix,
-			'marker' => $marker,
-			'limit' => $limit
-		];
+	$option = [
+		'bucket' => $bucket,
+		'prefix' => $prefix,
+		'marker' => $marker,
+		'limit' => $limit
+	];
 
-    $recursion = function ($option, $bucketObj, &$re) use(&$recursion) {
-        $total = count($re);$left = 0;
-        // 如果限制了数目，且，达到了总数，则返回。否则，设置下次取的数目。递归去取。
-        if ($option['limit'] > 0) {
-            if ($total >= $option['limit']) {
-                return;
-            }
-            $left = $option['limit'] - $total;
-        }
+  $recursion = function ($option, $bucketObj, &$re) use(&$recursion) {
+      $total = count($re);$left = 0;
+      // 如果限制了数目，且，达到了总数，则返回。否则，设置下次取的数目。递归去取。
+      if ($option['limit'] > 0) {
+          if ($total >= $option['limit']) {
+              return;
+          }
+          $left = $option['limit'] - $total;
+      }
 
-        list($files, $marker, $err) = $bucketObj->listFiles($option['bucket'], $option['prefix'], $option['marker'], $left);
-        if ($err) return;
+      list($files, $marker, $err) = $bucketObj->listFiles($option['bucket'], $option['prefix'], $option['marker'], $left);
+      if ($err) return;
 
-        foreach ($files as $v) {
-            $re[$v['key']] = $v['key'];
-        }
+      foreach ($files as $v) {
+          $re[$v['key']] = $v['key'];
+      }
 
-        // 如果没有取完，则递归再去取
-        if ($marker) {
-            $option['marker'] = $marker;
-            $recursion($option, $bucketObj, $re);
-        }
-    };
-    $re = [];
-    $recursion($option, $bucketMgr, $re);
+      // 如果没有取完，则递归再去取
+      if ($marker) {
+          $option['marker'] = $marker;
+          $recursion($option, $bucketObj, $re);
+      }
+  };
+  $re = [];
+  $recursion($option, $bucketMgr, $re);
 
-		return array_values($re)?:[];
+	return array_values($re)?:[];
 }
 {% endhighlight %}
 
