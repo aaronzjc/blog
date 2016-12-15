@@ -120,13 +120,14 @@ a {
  */
 blockquote {
     color: $grey-color;
-    border-left: 4px solid #b7b7b7;
+    border-left: 4px solid #41906c;
     padding-left: $spacing-unit / 2;
     font-size: 13px;
     font-style: normal;
     background: #f8f8f8 none repeat scroll 0 0;
-    padding-top:4px;
-    padding-bottom:4px;
+    padding-top:1rem;
+    padding-right: 0.5rem;
+    padding-bottom:1rem;
 
     > :last-child {
         margin-bottom: 0;
@@ -244,8 +245,8 @@ pre {
   * blockquote p
   */
   blockquote p {
-      letter-spacing: 0px;
-      margin-bottom: 5px;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
       font-family: monaco, monospace;
   }
 
