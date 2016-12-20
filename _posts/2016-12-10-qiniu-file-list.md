@@ -132,8 +132,6 @@ function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs')
     // $auth = self::getAuth();
     $bucketMgr = new BucketManager($auth);
 
-    $re = []; // 结果集
-
     $option = [
         'bucket' => $bucket,
         'prefix' => $prefix,
@@ -148,9 +146,9 @@ function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs')
             if ($left == 0) break;
         }
 
-        $total = count($re);
-
         list($files, $marker, $err) = $bucketMgr->listFiles($option['bucket'], $option['prefix'], $option['marker'], $left);
+
+        $total += count($files);
 
         foreach ($files as $K => $v) {
             yield $v['key'];
