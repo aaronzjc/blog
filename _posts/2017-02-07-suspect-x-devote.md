@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "《嫌疑犯人x的献身》所想"
+title: "《嫌疑人x的献身》所想"
 date:   2017-02-07 10:00:00 +0800
 categories: thinking
 ---
