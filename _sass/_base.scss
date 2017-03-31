@@ -23,7 +23,8 @@ body {
     -o-font-feature-settings: "kern" 1;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
-
+    color: #50596c;
+    text-rendering: optimizeLegibility;
 }
 
 
@@ -261,5 +262,6 @@ pre {
  }
 
 body p {
-  font-family: "Hiragino Sans GB", "Microsoft YaHei", sans-serif
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Hiragino Kaku Gothic Pro", Meiryo, "Malgun Gothic", "Helvetica Neue", sans-serif;
+  color: #667189;
 }
