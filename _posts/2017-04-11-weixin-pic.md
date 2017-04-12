@@ -42,7 +42,7 @@ function serverHandler($url) {
     // 替换图片的src为data-src
     $html = str_replace("data-src", "src", $html);
     // 替换为中转
-    $html = preg_replace('@http://mmbiz.qpic.cn[^\s]+(jpeg|png)@i', $imageHandle . '$0', $html);
+    $html = preg_replace('@http://mmbiz.qpic.cn[^\s]+(jpeg|png)@i', 'imageHandle($0)', $html);
 }
 
 function imageHandle($url) {
