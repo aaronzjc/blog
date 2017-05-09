@@ -74,7 +74,7 @@ $ firewall-cmd --query-port=9090/tcp # 查看端口是否开启
 
 #### service方式启动
 
-上面运行起来了gogs服务，通过在命令行下启动。也可以使用后台进程nohub，将gogs挂起，一直在后台运行。但是，我们更期望将gogs作为一项服务运行，方便管理。
+上面运行起来了gogs服务，通过在命令行下启动。也可以使用后台进程nohup，将gogs挂起，一直在后台运行。但是，我们更期望将gogs作为一项服务运行，方便管理。
 
 gogs的`scripts`目录下，有很多文件夹，里面有很多脚本，就是用来部署gogs服务的。我这里，将gogs作为Linux service启动。所以，进入到systemd目录下，有gogs.service文件。修改相关的字段，然后复制到`/etc/systemd/system`里面。接着启动即可。
 
