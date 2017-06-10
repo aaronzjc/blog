@@ -132,19 +132,19 @@ call_user_func($re, "fuck");
 {% highlight php %}
 <?php
 // wrapper3
-function($pass) use($wrapper2, $pipe3) {
+function wrapper3($pass) use($wrapper2, $pipe3) {
     return call_user_func($pipe3, $pass, $wrapper2);
 }
 // wrapper2
-function($pass) use($wrapper1, $pipe2) {
+function wrapper2($pass) use($wrapper1, $pipe2) {
     return call_user_func($pipe2, $pass, $wrapper1);
 }
 // wrapper1
-function($pass) use($wrapper0, $pipe1) {
+function wrapper1($pass) use($wrapper0, $pipe1) {
     return call_user_func($pipe1, $pass, $wrapper0);
 }
 // warpper0
-function($args){
+function wrapper0($args){
     echo "init\n";
     return $args;
 }
