@@ -242,15 +242,6 @@ pre {
      text-align: center;
  }
 
- /**
-  * blockquote p
-  */
-  blockquote p {
-      letter-spacing: 0.5px;
-      margin-bottom: 1rem;
-      font-family: monaco, monospace;
-  }
-
  code.highlighter-rouge {
     color: #417377;
  }
@@ -262,6 +253,6 @@ pre {
  }
 
 body p {
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Hiragino Kaku Gothic Pro", Meiryo, "Malgun Gothic", "Helvetica Neue", sans-serif;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Hiragino Kaku Gothic Pro", Meiryo, "Malgun Gothic", "Helvetica Neue", sans-serif;
   color: #667189;
 }
