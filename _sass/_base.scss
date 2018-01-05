@@ -133,6 +133,11 @@ blockquote {
     > :last-child {
         margin-bottom: 0;
     }
+
+    p {
+        font-family: monospace;
+        margin-bottom: 4px;
+    }
 }
 
 
