@@ -16,7 +16,7 @@ twitter_username: 不害羞滴含羞草
 github_username:  aaronzjc
 
 # gem files
-gems: [jekyll-paginate]
+plugins: [jekyll-paginate]
 
 # Build settings
 markdown: kramdown
