@@ -241,3 +241,14 @@
         }
     }
 }
+
+#gitalk-container .gt-comment-content{
+    background-color: #fff;
+    border: 1px solid #fafafa;
+}
+
+#gitalk-container .gt-comment-content:hover {
+    border: 1px solid #dcdcdc;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
