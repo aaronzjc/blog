@@ -11,28 +11,20 @@ layout: default
   <div class="post-content" itemprop="articleBody">
     {{ content }}
   </div>
-  <div id="disqus_thread"></div>
-  <script>
-  /**
-  * RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-  * LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
-  */
-  /*
-  var disqus_config = function () {
-  this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
-  this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-  };
-  */
-  (function() { // DON'T EDIT BELOW THIS LINE
-  var d = document, s = d.createElement('script');
+  <div id="gitalk-container"></div>
+  <script type="text/javascript">
+    const gitalk = new Gitalk({
+    clientID: '9f0e02eac82d2a26b53d',
+    clientSecret: '6a01314ce9735362a5c47a3fa57f460301ce27ae',
+    repo: 'aaronzjc.github.io',
+    owner: 'aaronzjc',
+    admin: ['aaronzjc'],
+    id: location.pathname,      // Ensure uniqueness and length less than 50
+    distractionFreeMode: false  // Facebook-like distraction free mode
+  })
 
-  s.src = '//myblogmemosa.disqus.com/embed.js';
-
-  s.setAttribute('data-timestamp', +new Date());
-  (d.head || d.body).appendChild(s);
-  })();
+  gitalk.render('gitalk-container')
   </script>
-  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
   <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
