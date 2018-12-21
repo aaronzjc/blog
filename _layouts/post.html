@@ -13,13 +13,16 @@ layout: default
   </div>
   <div id="gitalk-container"></div>
   <script type="text/javascript">
+    function getTitle() {
+      return document.querySelector(".post-title").innerText;
+    }
     const gitalk = new Gitalk({
     clientID: '9f0e02eac82d2a26b53d',
     clientSecret: '6a01314ce9735362a5c47a3fa57f460301ce27ae',
     repo: 'aaronzjc.github.io',
     owner: 'aaronzjc',
     admin: ['aaronzjc'],
-    id: location.pathname,      // Ensure uniqueness and length less than 50
+    id: getTitle(),      // Ensure uniqueness and length less than 50
     distractionFreeMode: false  // Facebook-like distraction free mode
   })
 
