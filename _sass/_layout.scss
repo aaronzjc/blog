@@ -2,12 +2,16 @@
  * Site header
  */
 .site-header {
-    border-top: 5px solid $grey-color-dark;
-    border-bottom: 1px solid $grey-color-light;
+    // border-top: 5px solid $grey-color-dark;
+    // border-bottom: 1px solid $grey-color-light;
     min-height: 56px;
 
     // Positioning context for the mobile navigation icon
     position: relative;
+}
+
+body a:hover {
+    text-decoration: none;
 }
 
 .site-title {
@@ -22,6 +26,10 @@
     &:visited {
         color: $grey-color-dark;
     }
+}
+
+.site-title:hover, .site-nav a:hover {
+    color: #3a7744;
 }
 
 .site-nav {
