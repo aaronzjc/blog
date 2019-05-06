@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "VSCode远程开发尝鲜"
+title: "remote-ssh开发尝鲜"
 date:   2019-05-05 10:00:00 +0800
 categories: php 
 ---
