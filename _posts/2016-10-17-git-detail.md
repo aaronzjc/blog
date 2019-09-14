@@ -2,7 +2,7 @@
 layout: post
 title: "《Pro Git》笔记-Git原理简单介绍"
 date:   2016-10-16 10:00:00 +0800
-categories: Linux
+categories: linux
 ---
 # Git对象
 

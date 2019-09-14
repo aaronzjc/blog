@@ -252,3 +252,16 @@ pre {
        color: $third-color;
    }
  }
+
+ .post-category {
+    h1 {
+        color: $primary-color;
+    }
+    &.top h1 {
+        color: #ff476c;
+    }
+ }
+
+ .post-category.recommend {
+
+ }

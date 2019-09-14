@@ -48,7 +48,11 @@ $on-laptop:        800px;
     }
 }
 
-
+@mixin media-query-pc() {
+	@media screen and (min-width: 600px) {
+		@content;
+	}
+}
 
 // Import partials from `sass_dir` (defaults to `_sass`)
 @import

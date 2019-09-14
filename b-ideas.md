@@ -1,6 +1,6 @@
 ---
-layout: page
-title: 有趣的
+layout: default
+title: 有意思的
 permalink: /ideas/
 ---
 

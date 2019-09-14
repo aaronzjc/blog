@@ -170,6 +170,21 @@ body a:hover {
     }
 }
 
+@include media-query-pc() {
+    /**
+    * 瀑布流
+    */
+    .categorys{
+        column-count: 2;
+        column-gap: 1rem;
+    }
+
+    .post-category {
+        break-inside: avoid;
+        margin: 0 0 1rem 0;
+    }
+}
+
 
 
 /**

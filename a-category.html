@@ -1,16 +1,33 @@
 ---
 layout: default
-title: 分类
+title: 标签
 permalink: /category/
 ---
-<div class="home">
+<div class="home categorys">
     {% for category in site.categories %}
+    {% if category[0] == "top" %}
+    <div class="post-category top">
+    <h1 class="page-heading"># 手动置顶</h1>
+    <ul>
+        {% for post in category[1] %}
+        <li><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></li>
+        {% endfor %}
+    </ul>
+	</div>
+	{% endif %}
+	{% endfor %}
+
+	{% for category in site.categories %}
+    {% if category[0] != "top" %}
+    <div class="post-category">
     <h1 class="page-heading"># {{ category[0] }}</h1>
     <ul>
         {% for post in category[1] %}
         <li><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></li>
         {% endfor %}
     </ul>
+	</div>
+	{% endif %}
     {% endfor %}
 
     <!-- <p class="rss-subscribe">订阅 <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p> -->

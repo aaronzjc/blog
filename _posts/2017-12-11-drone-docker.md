@@ -2,7 +2,7 @@
 layout: post
 title: "Drone+Docker部署示例"
 date:   2017-12-11 10:00:00 +0800
-categories: Dev
+categories: devops
 ---
 ## 概述
 

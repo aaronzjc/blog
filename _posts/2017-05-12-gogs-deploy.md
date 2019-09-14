@@ -2,7 +2,7 @@
 layout: post
 title: "webhooks自动部署"
 date:   2017-05-12 10:00:00 +0800
-categories: Linux
+categories: linux
 ---
 
 上一篇文章[《Gogs》](http://memosa.cn/linux/2017/05/08/centos-gogs.html)里面，介绍了如何使用Gogs，搭建自己的Git服务。但是，有了Git服务，只是有了一个地方来保存我们的项目，还需要一个地方保存正式代码。因此，需要一个项目部署，当仓库收到推送时，自动更新到代码库。

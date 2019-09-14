@@ -2,7 +2,7 @@
 layout: post
 title: "CentOS 7.0搭建Gogs服务"
 date:   2017-05-08 10:00:00 +0800
-categories: Linux
+categories: linux
 ---
 
 ## 概述

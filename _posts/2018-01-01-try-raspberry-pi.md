@@ -2,7 +2,7 @@
 layout: post
 title: "玩一玩树莓派"
 date:   2018-01-01 10:00:00 +0800
-categories: Linux
+categories: linux
 ---
 ## 概述
 
