@@ -29,7 +29,7 @@ body a:hover {
 }
 
 .site-title:hover, .site-nav a:hover {
-    color: #3a7744;
+    color: $primary-color;
 }
 
 .site-nav {
@@ -215,7 +215,7 @@ body a:hover {
     font-size: 30px;
     letter-spacing: -1px;
     line-height: 1;
-    color: #3a7744;
+    color: $primary-color;
 
     @include media-query($on-laptop) {
         font-size: 30px;

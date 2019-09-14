@@ -45,15 +45,16 @@ ul, ol, dl, figure,
  * Images
  */
 img {
-    max-width: 80%;
-    max-height: 300px;
+    max-width: 66%;
     vertical-align: middle;
 }
 
 p img {
   display: block;
   margin:0px auto;
-  border: 2px solid #dadada;
+  width: 100%;
+  height:auto;
+  border: 1px solid #dadada;
   border-radius: 3px 3px;
 }
 
@@ -122,13 +123,10 @@ a {
 blockquote {
     color: $grey-color;
     border-left: 4px solid #41906c;
-    padding-left: $spacing-unit / 2;
-    font-size: 13px;
+    font-size: $base-font-size * 0.925;
     font-style: normal;
     background: #f8f8f8 none repeat scroll 0 0;
-    padding-top:1rem;
-    padding-right: 0.5rem;
-    padding-bottom:1rem;
+    padding: 1rem 0 1rem $spacing-unit / 2;
 
     > :last-child {
         margin-bottom: 0;
@@ -147,11 +145,10 @@ blockquote {
  */
 pre,
 code {
-    font-size: 12px;
-    border: 1px solid $grey-color-light;
-    border-radius: 3px;
-    background-color: rgb(241, 243, 247);
-    font-family: monaco, monospace;
+    font-size: $base-font-size * 0.8;
+    border-radius: 1px;
+    background-color: $code-color;
+    font-family: Consolas, Monaco, monospace;
 }
 
 
@@ -252,13 +249,11 @@ pre {
  }
 
  .post-content {
-   h1, h2, h3, h4, h5, h6 {
-       color: #e06e38;
+   h1, h2, h3 {
+       color: $secondary-color;
+   }
+
+   h4, h5, h6 {
+       color: $third-color;
    }
  }
-
-body p {
-  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-  color: #667189;
-  letter-spacing: 0.05rem;
-}
