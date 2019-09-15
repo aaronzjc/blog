@@ -8,7 +8,9 @@ dl, dd, ol, ul, figure {
     padding: 0;
 }
 
-
+* {
+    -webkit-tap-highlight-color: transparent;
+}
 
 /**
  * Basic styling
