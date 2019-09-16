@@ -19,6 +19,10 @@ layout: default
   <div class="post-content" itemprop="articleBody">
     {{ content }}
   </div>
+  <blockquote>
+    <p>本文地址: <a href="{{ site.url }}{{ page.url }}">{{ site.url }}{{ page.url }}</a></p>
+    <p>版权声明: 本博客所有文章除特别声明外，均采用<a href="https://creativecommons.org/licenses/by-nc-sa/3.0/">CC BY-NC-SA 3.0</a>许可协议，转载请注明出处。</p>
+  </blockquote>
   <div id="gitalk-container"></div>
   <script type="text/javascript">
     function getTitle() {
