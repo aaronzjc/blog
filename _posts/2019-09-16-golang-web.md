@@ -2,7 +2,7 @@
 layout: post
 title: "Go Web从开发到部署"
 date:   2019-09-16 22:00:00 +0800
-categories: golang,web
+categories: golang web
 ---
 自己最近在写一个Golang的web项目。从写下第一行代码，到最终整个小网站能够运行呈现出来，幕后的事情也是挺多的。实践下来，整套开发流程非常流畅舒服，遂总结一下，供感兴趣的人了解。
 
