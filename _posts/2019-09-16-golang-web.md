@@ -99,23 +99,87 @@ steps:
         from_secret: host_password
       port: 22
       script:
-        - cd /data/docker_ucloud/apps/crawler
-        - sudo docker-compose -f crawler.yml down
-        - sudo docker-compose -f crawler.yml pull
-        - sudo docker-compose -f crawler.yml up -d
+        - sudo docker service update --with-registry-auth --force --image image_name:latest mu_crawler
+        - sudo docker service update --with-registry-auth --force --image image_name:latest  mu_mu
 
 trigger:
   branch:
     - master
 {% endhighlight %}
 
-CI/CD一共分4个步骤。构建，执行make生成两个可执行文件。注意，这里需要使用带make工具的镜像；打包镜像，因为两个Dockerfile非常相似，这里使用Docker的分阶段构建，构建两个镜像；部署，直接使用ssh插件，登录到服务器目录，启动docker-compose即可。
+CI/CD一共分4个步骤。构建，执行make生成两个可执行文件。注意，这里需要使用带make工具的景象；打包镜像，因为两个Dockerfile非常相似，这里使用Docker的分阶段构建，构建两个镜像；部署，直接使用插件，ssh到服务器执行目录，启动服务。
 
 关于Drone怎么使用，可以参考之前的文章，也可以上官方阅读文档了解。实际构建效果图
 
 ![图片]({{ site.url }}/assert/imgs/goweb_1.png)
 
+### 部署
+
+上面介绍完Drone自动化构建部署。最后，介绍下具体是怎么部署运行的。之前提到过，应用最终是通过Docker运行的。所以，首先需要打包一个Docker镜像。
+
+{% highlight dockerfile %}
+FROM alpine:3.7 as crawler
+ENV APP_ENV production
+RUN apk add --no-cache ca-certificates tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN mkdir /app
+COPY ./bin/crawler /app/
+WORKDIR /app
+CMD ["./crawler"]
+
+FROM alpine:3.7 as mu
+ENV APP_ENV production
+RUN apk add --no-cache ca-certificates tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN mkdir -p /app/public
+COPY ./bin/mu /app/
+COPY ./public /app/public
+WORKDIR /app
+EXPOSE 7980
+CMD ["./mu"]
+{% endhighlight %}
+
+打包镜像很简单，将前面编译出来的可执行文件，放到指定目录，然后执行。启动容器方式也很简单
+
+{% highlight shell %}
+docker run -d -v /path/to/app.json:/app/app.json image_name:tag app_crawler
+docker run -d -p 7980:7980 -v /path/to/app.json:/app/app.json image_name:tag app_mu
+{% endhighlight %}
+
+用这种方式去部署没问题，也可以使用其他方式，例如k8s等。我这里图简单，是使用Swarm+DockerStack的方式来部署的。
+
+关于swarm如何部署，可以阅读文档直接在命令行下部署。我使用的是一个开源管理软件`Portainer`。首先在Portainer上建好`app.json`
+配置文件，然后建立这么一个stack部署文件，再发布就好了
+
+{% highlight yaml %}
+version: '3.7'
+services:
+  crawler:
+    image: uhub.service.ucloud.cn/memosa/crawler:latest
+    deploy:
+      replicas: 1
+    configs:
+      - source: app_mu_config
+        target: /app/app.json
+  mu:
+    image: uhub.service.ucloud.cn/memosa/mu:latest
+    deploy:
+      replicas: 1
+    ports:
+      - 7980:7980
+    configs:
+      - source: app_mu_config
+        target: /app/app.json
+configs:
+  app_mu_config:
+    external: true
+{% endhighlight %}
+
 容器启动以后，还需要部署一个nginx在前面做反向代理，将域名请求代理到服务上。这里我并没有在后端服务上去支持https，而是在nginx这一层做的https处理。
+
+如果整个过程没问题的话，服务就可以访问了。然后，后面更新代码，会走CI去自动拉镜像更新服务。这样，就完成整个自动化部署过程了。来一个运行状态效果图
+
+![图片]({{ site.url }}/assert/imgs/goweb_2.png)
+
+体验非常好。
 
 ## 最后
 
