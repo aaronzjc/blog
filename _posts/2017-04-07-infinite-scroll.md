@@ -20,7 +20,7 @@ categories: web
 ## 一个滚动例子
 无限加载有两个场景，一种是，滚动的元素是DOM的某一个容器；另一种是，滚动的是整个页面。这两者，在获取上面提到的距离，有一定的差异性。
 
-<script async src="//jsrun.net/D9kKp/embed/all/light/"></script>
+<iframe width="100%" height="300" src="//jsrun.pro/D9kKp/embedded/all/light/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 简单说明下，其中用到的三个高度值，具体指的是啥子高度
 

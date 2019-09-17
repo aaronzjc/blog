@@ -14,7 +14,7 @@ categories: web
 
 一个完美的Tab显示，应该是Tab的各个项宽度一样。因为Tab项的个数不一定，用普通的float等方式，宽度不太好控制。利用Flex布局，可以很完美的实现这样的效果，最后的代码和效果如下
 
-<iframe width="80%" height="300" src="//jsrun.net/p4pKp/embedded/html,css,result/light/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe width="100%" height="300" src="//jsrun.net/p4pKp/embedded/html,css,result/light/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 ## 封装成Vue组件
 很容易就想到一个Tab组件涉及的逻辑。外层传递一个Tab项的列表给这个组件，组件渲染结果，点击Tab项，切换不同的Tab。初步的封装，代码如下
