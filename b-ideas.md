@@ -9,4 +9,4 @@ permalink: /ideas/
 * [N子棋](https://github.com/aaronzjc/Personal_Toys/tree/master/N%20cheese)
 * [Todo提醒](https://github.com/aaronzjc/Personal_Toys/tree/master/Note)
 * [Vue-Chat](https://github.com/aaronzjc/vue-chat)
-* [Mu-热榜聚合](https://github.com/aaronzjc/crawler)
+* [Mu-热榜聚合](https://github.com/aaronzjc/mu)
