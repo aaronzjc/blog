@@ -16,7 +16,7 @@ categories: golang web
 
 ## 项目介绍
 
-地址: [https://github.com/aaronzjc/crawler](https://github.com/aaronzjc/crawler)
+地址: [https://github.com/aaronzjc/mu](https://github.com/aaronzjc/mu)
 
 `MU`是一个非常简单的热榜聚合网站。会定时去获取自己经常访问的几个站点的指定内容，然后存储至Redis中，供集中展示。整个项目的架构如图
 
