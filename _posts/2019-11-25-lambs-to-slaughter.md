@@ -2,7 +2,7 @@
 layout: post
 title: "lambs to slaughter"
 date:   2019-11-25 10:00:00 +0800
-categories: thinking, top
+categories: thinking top
 ---
 
 > lambs to slaughter
