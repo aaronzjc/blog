@@ -37,15 +37,8 @@ func main() {
             fmt.Println("hello")
         }()
         select {
-        case <- ch:
-            // 如果任务处理完成了，再启动协程去做另一个任务
+        case <- ch:        
             fmt.Println("A Done")
-            wg.Add(1)
-            go func() {
-                defer wg.Done()
-                time.Sleep(time.Second)
-                fmt.Println("A-A Done")
-            }()
         case <- e:
             // 如果收到终止信号，这里不执行任务退出了
             fmt.Println("A Cancel")
@@ -61,17 +54,7 @@ func main() {
 }
 {% endhighlight %}
 
-上面的例子就实现了一个，超时取消后续任务的逻辑。这里有一个点需要注意的是，对于这个任务
-
-{% highlight go %}
-go func() {
-    time.Sleep(time.Second*2)
-    ch <- 1
-    fmt.Println("hello")
-}()
-{% endhighlight %}
-
-如果协程开始了，就不可取消了。因为协程的独立性，虽然父协程已经返回了，但是这个协程已经启动了，所以没办法取消了。只能说他的执行结果已经不重要了。最终之所以没有执行返回，是因为`main`协程退出，而强制杀死了这个协程，如果`main`协程不退出，这里依然会看到这个协程的输出值。
+上面的例子就是使用通道实现了一个，超时取消后续任务的逻辑。
 
 ## Context包
 
