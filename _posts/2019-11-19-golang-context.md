@@ -215,8 +215,8 @@ func B(ctx context.Context) {
 		LogT("B Done")
 		// do B1, B2
 		wg.Add(2)
-		go B1(bCtx)
-		go B2(bCtx)
+		go Bb(bCtx, "B1")
+		go Bb(bCtx, "B2")
 	case <- ctx.Done():
 		LogT("B Cancel")
 		cancel()
@@ -224,28 +224,15 @@ func B(ctx context.Context) {
 	wg.Done()
 }
 
-func B1(ctx context.Context) {
+func Bb(ctx context.Context, name string) {
 	defer wg.Done()
-	fmt.Println("this is B1")
+	fmt.Println("this is " + name)
 
 	select {
-	default:
-		time.Sleep(time.Second * 1)
-		LogT("job B1 Done")
+	case <- time.After(time.Second * 2):
+		LogT("job " + name + " Done")
 	case <- ctx.Done():
-		LogT("B1 Cancel")
-	}
-}
-
-func B2(ctx context.Context) {
-	defer wg.Done()
-	fmt.Println("this is B2")
-	select {
-	default:
-		time.Sleep(time.Second * 1)
-		LogT("job B2 Done")
-	case <- ctx.Done():
-		LogT("B2 Cancel")
+		LogT(name + " Cancel")
 	}
 }
 
@@ -254,10 +241,15 @@ var wg = sync.WaitGroup{}
 func main() {
 	LogT("start")
 
-	ctx, _ := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	wg.Add(2)
 	go A(ctx)
 	go B(ctx)
+
+	//go func() {
+	//	time.Sleep(time.Second*3)
+	//	cancel()
+	//}()
 
 	LogT("end")
 	wg.Wait()
