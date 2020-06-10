@@ -2,7 +2,7 @@
 layout: post
 title: "Gitlab Wiki最佳实践"
 date:   2020-06-07 22:00:00 +0800
-categories: doc
+categories: devops
 ---
 
 ## 介绍
