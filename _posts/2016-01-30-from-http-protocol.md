@@ -19,7 +19,7 @@ categories: web
 
 ## Web服务器
 Web服务器就是响应请求的一方。其本质是一套能绑定在指定端口，解析HTTP协议，并返回指定格式的响应的应用程序。因为HTTP是基于TCP/IP协议的，而TCP/IP协议又是通过socket来进行通信的。所以我们可以很简单的自己就实现一个HTTP服务器。只需要绑定到指定端口，监听请求，返回指定HTTP协议格式的内容即可。因为本身HTTP协议也十分的简单，所以，看下面的一个Python实现的HTTP服务器的小例子，这里对于所有的连接都返回一段固定的字符串：
-{% highlight python %}
+```python
 from socket import *
 
 s = socket(AF_INET, SOCK_STREAM)
@@ -41,7 +41,7 @@ while True:
     data = str
     con.send(bytes(data, encoding='UTF-8'))
     con.close()
-{% endhighlight %}
+```
 运行结果
 
 ![Python Http]({{site.baseurl}}/assert/imgs/from_http_1.png)

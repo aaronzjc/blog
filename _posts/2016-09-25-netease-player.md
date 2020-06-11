@@ -21,15 +21,15 @@ categories: jekyll
 
 Jekyll使用的markdown解析器是`kradown`解析器。按照[文档](https://kramdown.gettalong.org/syntax.html)，在文章内容中，加上如下的标签，解析器就不会处理而原样输出HTML标签了。
 
-{% highlight text %}
+```text
 {::nomarkdown}
 <iframe></iframe>
 {:/nomarkdown}
-{% endhighlight %}
+```
 
 最后，就嵌入了一个漂亮的音乐播放器了。
 
-{% highlight text %}
+```text
 
 《The Roving Gambler》
 
@@ -42,4 +42,4 @@ Jekyll使用的markdown解析器是`kradown`解析器。按照[文档](https://k
 后面就是女孩和奶奶的台词，用女孩的角度来诉说她们之间的对话。
 
 挺有意思的一首民谣。
-{% endhighlight %}
+```

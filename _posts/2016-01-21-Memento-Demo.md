@@ -27,7 +27,7 @@ categories: web
 ## PHP实例
 
 关键点就是在对象内部设置一个备忘录管理器对象，然后实现存储状态和恢复状态。
-{% highlight php %}
+```php
 <?php
 class Original {
     public $state = '';
@@ -92,7 +92,7 @@ $origin->setMemento(); // 回退三次, 回到原始状态
 echo 'Third Ctrl+z : ' . $origin->getState() . "\n";
 $origin->setMemento(); // 回退四次, 应该后退失败
 echo 'Four Ctrl+z : ' . $origin->getState() . "\n";
-{% endhighlight %}
+```
 如上就是PHP实现的简单的例子。核心的原理是栈，保存时状态入栈，回退时出栈,就实现先后顺序了。我想，应该还可以对每个状态指定一个名字，然后回退时根据名字来设置状态。，这样就不是回退了，是跳跃了，哈。
 
 实际开发中，遇到这么一个需求，想到用备忘录模式是最合适不过了。
@@ -110,7 +110,7 @@ your browser does not support the video tag
 </video>
 </div>
 主要代码如下
-{% highlight javascript %}
+```javascript
 function MeChart(ele) {
     var self = this;  // 保护this变量
     this.ele = ele;  // 初始化的DOM元素
@@ -155,7 +155,7 @@ function MeChart(ele) {
 
     // ...
 }
-{% endhighlight %}
+```
 
 ## 最后
 完。

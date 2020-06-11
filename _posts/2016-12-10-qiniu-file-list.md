@@ -8,14 +8,14 @@ categories: php
 ## 概述
 在接触七牛云开发时，用到这么一个接口，获取空间中所有的文件名。七牛提供了相关的接口，接口定义如下
 
-{% highlight php %}
+```php
 <?php
 use Qiniu\Storage\BucketManager;
 // ...
 $bucketMgr = new BucketManager($auth);
 $bucketMgr->listFiles($bucket, $prefix, $marker, $limit);
 // ...
-{% endhighlight %}
+```
 
 其中，$marker是查询结果的当前游标，根据此参数可以从当前结果位置往后继续查；$prefix是文件名的前缀，用于过滤文件；$limit是查询的数目限制。
 
@@ -27,7 +27,7 @@ $bucketMgr->listFiles($bucket, $prefix, $marker, $limit);
 
 这是一个很清晰的递归的问题了。就是第一次查，如果后面还有数据，则，根据返回的$marker继续查，一直到$marker不存在了就结束。很好，很粗暴。封装时，用到了PHP中的闭包函数。在闭包里面定义递归函数，这样就不必在函数外再定义一个函数了。代码如下
 
-{% highlight php %}
+```php
 <?php
 function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
   	// $auth = self::getAuth();
@@ -70,7 +70,7 @@ function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
 
   	return array_values($re)?:[];
 }
-{% endhighlight %}
+```
 
 如上，就是递归的整个代码。有一个小坑就是，匿名闭包，那里使用的是`use (&$recursion)`而不是`use ($recursion)`，因为在定义这个函数时，$recursion还是NULL，按照值传递进去是无法执行的。参考这里[StackOverFlow](http://stackoverflow.com/questions/2480179/anonymous-recursive-php-functions)。
 
@@ -78,7 +78,7 @@ function listFiles($limit = 200, $prefix = '', $bucket = 'none', $marker = '') {
 
 通常，递归的方式会产生额外的开销。所以，这里想了另一种非递归方式来处理。非递归的方式，当遇到查询结尾时，直接退出循环即可。
 
-{% highlight php %}
+```php
 <?php
 
 function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs') {
@@ -115,7 +115,7 @@ function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs')
 
     return array_values($re)?:[];
 }
-{% endhighlight %}
+```
 
 如上，就是非递归方式。其实两者代码复杂度上来看，是差不多的。但是，我觉得循环比递归更好控制一些。
 
@@ -125,7 +125,7 @@ function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs')
 
 所以，聪明的读者，可能想到了，我的想法就是将返回结果改造成生成器。生成器占用的内存少，缺点是结果集只能迭代了。最后的修改后代码如下
 
-{% highlight php %}
+```php
 <?php
 
 function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs') {
@@ -158,7 +158,7 @@ function listFiles($limit = 200, $prefix = '', $marker = '', $bucket = 'saasjs')
         $option['marker'] = $marker;
     }
 }
-{% endhighlight %}
+```
 
 ## 最后
 

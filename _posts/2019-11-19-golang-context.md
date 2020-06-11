@@ -10,7 +10,7 @@ categories: golang
 
 这样的场景在Web开发中算是比较常见的。通常一个系统可能涉及到调用多个接口服务去处理逻辑，很难保证每个接口都能百分百快速响应。当无法保证稳定性时，只能期望在某一个服务超时时，我们能快速返回，中断后续的执行。如果在普通的过程调用中，可以很好地控制。但是涉及到协程时，就会比较麻烦。看看实现这样的一个超时中断，可以怎么做。
 
-{% highlight go %}
+```go
 package main
 
 import (
@@ -52,7 +52,7 @@ func main() {
 
     wg.Wait()
 }
-{% endhighlight %}
+```
 
 上面的例子就是使用通道实现了一个，超时取消后续任务的逻辑。
 
@@ -64,7 +64,7 @@ func main() {
 
 先看一个如何使用`Context`包的例子
 
-{% highlight go %}
+```go
 package main
 
 import (
@@ -92,13 +92,13 @@ func main() {
 
 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 }
-{% endhighlight %}
+```
 
 上面就是使用`context.WithTimeout`设置一个超时`Context`的示例。他会在1秒后关闭`ctx.Done`通道。然后被`select`监听到，执行后续流程。最终`main`执行完毕，退出，其他协程也会终止。
 
 也可以使用`context.WithCancel`设置一个手动取消的`Context`。下面就是，在一个单独的协程中，2s后手动`cancel`
 
-{% highlight go %}
+```go
 func main() {
     // 给main协程设置一个1s超时context
     ctx, cancel := context.WithCancel(context.Background())
@@ -117,7 +117,7 @@ func main() {
     }
     fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 }
-{% endhighlight %}
+```
 
 此时可以看到打印了一个`done sleep 1s`。因为2秒的时间足够执行完这个协程了。
 
@@ -163,7 +163,7 @@ func main() {
 
 如下是根据上图关系，构造的一个示例
 
-{% highlight go %}
+```go
 package main
 
 import (
@@ -254,11 +254,11 @@ func main() {
 	LogT("end")
 	wg.Wait()
 }
-{% endhighlight %}
+```
 
 最后在我的电脑输出结果是
 
-{% highlight text %}
+```text
 2019-11-19 16:56:52 : start
 2019-11-19 16:56:52 : end
 this is B
@@ -271,7 +271,7 @@ this is B2
 2019-11-19 16:56:54 : B2 Cancel
 this is B1
 2019-11-19 16:56:54 : B1 Cancel
-{% endhighlight %}
+```
 
 `A`和`B`各自执行2s。然后`B`在2s执行完后，有一个协程终止后续执行，所以整个程序只执行了2s的时间。可以看到`B1`和`B2`开启后，立刻就结束了。
 
@@ -283,7 +283,7 @@ this is B1
 
 首先，就是最重要的`Context`接口了
 
-{% highlight go %}
+```go
 type Context interface {
     // 返回中断截止时间
     Deadline() (deadline time.Time, ok bool)
@@ -297,11 +297,11 @@ type Context interface {
     // Context可以携带的值
     Value(key interface{}) interface{}
 }
-{% endhighlight %}
+```
 
 上面介绍的`WithTimeout`方法等，返回的各个`Context`结构体，都实现了该接口。一共定义了如下几个`Context`结构体
 
-{% highlight go %}
+```go
 // 空Context。Background和TODO会返回此类型。它实现的接口方法啥都没干。所以此Context不会终止。
 type emptyCtx int
 
@@ -322,11 +322,11 @@ type timerCtx struct {
 
     deadline time.Time // 截止时间
 }
-{% endhighlight %}
+```
 
 然后，看看`WithCancel`方法是怎么初始化`Context`结构体的
 
-{% highlight go %}
+```go
 func newCancelCtx(parent Context) cancelCtx {
     return cancelCtx{Context: parent}
 }
@@ -371,11 +371,11 @@ func propagateCancel(parent Context, child canceler) {
         }()
     }
 }
-{% endhighlight %}
+```
 
 再对比下`WithDeadline`的初始化
 
-{% highlight go %}
+```go
 func WithDeadline(parent Context, d time.Time) (Context, CancelFunc) {
     // 如果父Context的截止时间早于当前Context。那就不必设置截止时间了，反正到时候父Context会自动取消子Context。
     if cur, ok := parent.Deadline(); ok && cur.Before(d) {
@@ -407,11 +407,11 @@ func WithDeadline(parent Context, d time.Time) (Context, CancelFunc) {
     }
     return c, func() { c.cancel(true, Canceled) }
 }
-{% endhighlight %}
+```
 
 最后，看下`Done`和`cacel`方法是怎么配合，发出信号的
 
-{% highlight go %}
+```go
 func (c *cancelCtx) Done() <-chan struct{} {
     c.mu.Lock()
     // 初始化chan
@@ -452,7 +452,7 @@ func (c *cancelCtx) cancel(removeFromParent bool, err error) {
         removeChild(c.Context, c)
     }
 }
-{% endhighlight %}
+```
 
 `Context`包内容大致如此。
 

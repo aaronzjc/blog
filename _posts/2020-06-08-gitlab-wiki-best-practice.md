@@ -19,9 +19,9 @@ Gitlab也提供代码库的方式来管理`wiki`。所以，这里介绍下我�
 
 首先，新建一个`wiki`仓库后，`clone`到本地
 
-{% highlight shell %}
+```shell
 git clone ${WIKI代码库}.wiki.git
-{% endhighlight %}
+```
 
 之后，本地会看到一个空的目录。接下来就可以进行编写了。
 

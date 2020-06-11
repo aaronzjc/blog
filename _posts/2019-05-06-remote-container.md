@@ -29,7 +29,7 @@ VSCode团队也是看到了这个趋势。于是开发了这么一个`remote-con
 
 官方的容器环境比较简单，这里，我修改了一下，安装了一些常用的扩展。完整的内容如下
 
-{% highlight text %}
+```text
 FROM php:7-cli
 
 ENV COMPOSER_MIRROR=https://packagist.org \
@@ -57,7 +57,7 @@ RUN apt-get autoremove -y \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 	
-{% endhighlight %}
+```
 
 然后，在容器中启动。VSCode就会自动构建这个容器，并且，将我们的项目映射到容器里面。
 

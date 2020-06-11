@@ -24,18 +24,18 @@ categories: web
 
 代码说明如下
 
-{% highlight html %}
+```html
 <!--旧的方式-->
 <iframe src="article-url"></iframe>
 
 <!--新的方式-->
 <iframe src="serverHandler(article-url)"></iframe>
-{% endhighlight %}
+```
 
 
 服务器端的处理是
 
-{% highlight php %}
+```php
 <?php
 function serverHandler($url) {
     $html = Http::Get($url);
@@ -53,7 +53,7 @@ function imageHandle($url) {
     $img = Http::Get($url);
     echo $img;
 }
-{% endhighlight %}
+```
 
 ## 最后
 上面用一些简要的代码，描述了下，大概思路。就是这样。

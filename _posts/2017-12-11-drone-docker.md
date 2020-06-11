@@ -22,7 +22,7 @@ Docker里面有三个很重要的东西：镜像(image)，容器(container)，�
 
 Docker常用的命令有以下这么些
 
-{% highlight shell %}
+```shell
 docker build -t friendlyname . # 根据当前目录的Dockerfile构建一个镜像，标签是friendlyName
 docker run -p 4000:80 friendlyname  # 运行刚才构建好的镜像，并绑定端口
 docker run -d -p 4000:80 friendlyname  # 和上面一样，但是指定在后台运行
@@ -39,7 +39,7 @@ docker login  # CLI登录，登录了才能push镜像到仓库
 docker tag <image> username/repository:tag  # 给镜像打一个远程标签
 docker push username/repository:tag  # git push
 docker run username/repository:tag  # git pull & run
-{% endhighlight %}
+```
 
 从上面的命令可以看出基本的镜像使用的大致流程
 
@@ -78,7 +78,7 @@ Registry上面介绍过了，是用来存放镜像的地方。类似于Github的
 
 `Dockerfile`文件
 
-{% highlight text %}
+```text
 FROM php
 
 ADD index.php /var/www/
@@ -88,11 +88,11 @@ EXPOSE  8065
 WORKDIR /var/www/
 
 CMD ["php", "-S", "0.0.0.0:8065"]
-{% endhighlight %}
+```
 
 `.drone.yml`文件
 
-{% highlight yaml %}
+```yaml
 workspace:
   base: /root
   path: src/gogs/memosa/docker-demo
@@ -124,7 +124,7 @@ pipeline:
       - docker pull repo_url:latest
       - docker rm -f docker-demo || true # 这里这样是因为如果不存在docker-demo，rm会报错
       - docker run -d -p 8065:8065 --name docker-demo repo_url
-{% endhighlight %}
+```
 
 Drone实际运行的效果就是下面这样的
 

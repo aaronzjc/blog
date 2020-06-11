@@ -20,33 +20,33 @@ categories: php
 
 ### 任务格式说明
 crontab任务格式如下
-{% highlight plain text %}
+```plain text
 minute   hour   day   month   week   command
-{% endhighlight %}
+```
 crontab使用*和数字来指定时间，图片解释了每个时间的取值。
 ![crontab]({{ site.url }}/assert/imgs/crontab_1.png)
 除了上面的常规数值之外，还可以使用一些特殊字符：
-{% highlight plain text %}
+```plain text
 *  代表所有的值，不指定时，表示符合该条件的任何一个点。例如，月份不指定时，表示每月都执行。
 ,  多字段可选。使用逗号隔开时，字段满足列表中的任何一个。
 -  表示范围。
 /  指定时间的间隔频率。例如，每5分钟执行，*/5。
-{% endhighlight %}
+```
 对于command，需要是系统可执行的。并且，crontab文件中不允许命令换行，即使很长。
 
 ### 几个任务例子
 每分钟执行一条命令
-{% highlight shell %}
+```shell
 * * * * * /usr/bin/ls
-{% endhighlight %}
+```
 每天凌晨3点执行php程序
-{% highlight shell %}
+```shell
 0 3 * * * /usr/bin/php demp.php
-{% endhighlight %}
+```
 每月1号和10号早上3点和下午1点，间隔15分钟执行
-{% highlight shell %}
+```shell
 */15 3,13 1,10 * * command
-{% endhighlight %}
+```
 
 ## 使用
 打开终端，输入`crontab -e`，编辑crontab任务。保存后，会出现，`crontab installing new crontab`，表示新建成功。
@@ -54,9 +54,9 @@ crontab使用*和数字来指定时间，图片解释了每个时间的取值。
 ![crontab_use]({{ site.url }}/assert/imgs/crontab_2.png)
 
 这里，我新建的任务是，列出目录至ls.log文件。
-{% highlight shell %}
+```shell
 * * * * * ls > /tmp/
-{% endhighlight %}
+```
 查看当前用户的任务列表, 以及删除任务。
 
 ![crontab_l]({{ site.url }}/assert/imgs/crontab_4.png)

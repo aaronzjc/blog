@@ -29,7 +29,7 @@ MySQL中，页是最小的磁盘操作单位。页默认大小是16K，可以调
 
 首先，按照如下的建表语句建表，包含一个主键索引和一个联合索引
 
-{% highlight sql %}
+```sql
 CREATE TABLE `test` (
 `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
 `name` varchar(64) DEFAULT NULL,
@@ -38,11 +38,11 @@ CREATE TABLE `test` (
 PRIMARY KEY (`id`),
 KEY `name_phone_idx` (`name`,`phone`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-{% endhighlight %}
+```
 
 然后写个脚本，插入一些数据
 
-{% highlight php %}
+```php
 <?php
 $pdo = new PDO("mysql:dbname=mu;host=127.0.0.1;port=3307", "root", "root");
 $sql = "insert into test(`name`, `age`, `phone`) value (?,?,?)";
@@ -50,7 +50,7 @@ $st = $pdo->prepare($sql);
 for ($i=0;$i<100;$i++) {
     $st->execute(["user_" . $i, "age_" . $i, "13111111111" + $i]);
 }
-{% endhighlight %}
+```
 
 MySQL的表数据文件通常放在`/var/lib/mysql/table_name`里面，后缀是`ibd`。使用16进制编辑器打开测试表的表数据文件。
 

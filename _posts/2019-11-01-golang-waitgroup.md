@@ -6,7 +6,7 @@ categories: golang
 ---
 `sync.WaitGroup`是官方提供的一个包，用于控制协程同步。通常场景，我们需要等待一组协程都执行完成以后，做后面的处理。如果不使用这个包的话，可能会像下面这样去实现
 
-{% highlight go %}
+```go
 package main
 
 import "fmt"
@@ -24,11 +24,11 @@ func main() {
         fmt.Println(<- ch)
     }
 }
-{% endhighlight %}
+```
 
 使用for-select也是可以的。接着，看下使用官方提供的包可以怎么做
 
-{% highlight go %}
+```go
 package main
 
 import (
@@ -47,7 +47,7 @@ func main() {
     }
     wg.Wait()
 }
-{% endhighlight %}
+```
 
 对比下，下面的方式更加简单，便于理解。那么问题来了，`sync.WaitGroup`是怎么实现协程同步的呢？跳转到包的定义，发现这个包实现很简单，100多行的代码，于是学习了下。
 
@@ -86,7 +86,7 @@ func main() {
 
 首先，思考下，对于如下的结构体，占用的内存是多少呢？
 
-{% highlight go %}
+```go
 package main
 
 import (
@@ -105,7 +105,7 @@ func main() {
     fmt.Printf("t size : %d, aligh = %d\n", unsafe.Sizeof(t), unsafe.Alignof(t))
 }
 
-{% endhighlight %}
+```
 
 按照各个类型占用的大小相加，1+4+1=6，可能会得出这个结构体占用6个字节的结论。然而实际上不是的，最终输出的结果是12！
 
@@ -121,10 +121,10 @@ func main() {
 
 我们知道，数组在内存中是一个连续的内存块。对于这么一个变量`[3]int32{1,2,3}`，在内存中是这样的
 
-{% highlight text %}
+```text
 # 3 * 32位    
 000...001   000...010   000...100      
-{% endhighlight %}
+```
 
 然后再来了解`unsafe.Pointer`这个类型。这个东西很神奇，看文档介绍
 
@@ -135,18 +135,18 @@ func main() {
 
 后两个不管，看前两点，Pointer可以转换成任意指针类型。试试如下代码
 
-{% highlight go %}
+```go
 a := [3]int32{1,2,3}
 b := (*uint64)(unsafe.Pointer(&a))
 fmt.Println(*b) // 8589934593: 000...001  000...010
-{% endhighlight %}
+```
 
 神奇之处在于，我们凭空构造了一个指向内存中64位数据的uint64指针，真正的直接操作内存。看到这里，我试了下，能否直接定义一个*uint64，指向这个数组的地址，然后得到相同的结果呢？
 
-{% highlight go %}
+```go
 a := [3]int32{1,2,3}
 var c *uint64 = &a // 报错了
-{% endhighlight %}
+```
 
 最后答案是不可以的，报错了，不同指针类型不能相互转换。
 
@@ -160,7 +160,7 @@ var c *uint64 = &a // 报错了
 
 位运算应该算是一个基础知识，但是自己学习时总是会忽略，因为自己开发中用的很少。这里，再捡起来学习一下。
 
-{% highlight go %}
+```go
 package main
 
 import "fmt"
@@ -171,13 +171,13 @@ func main() {
     fmt.Println(a >> 1) // 1
     fmt.Println(a << 1) // 6
 }
-{% endhighlight %}
+```
 
 ### 实现细节
 
 `sync.WaitGroup`结构体定义如下
 
-{% highlight go %}
+```go
 type WaitGroup struct {
     noCopy noCopy // 防止copy
 
@@ -187,18 +187,18 @@ type WaitGroup struct {
     // 因此，可以看出，Go中允许的协程总数是2^32个。
     state1 [3]uint32
 }
-{% endhighlight %}
+```
 
 这个结构体定义是优化过的，原先的结构体定义如下，
 
-{% highlight go %}
+```go
 type WaitGroup struct {
     noCopy noCopy // 防止copy
     
     state1 [12]byte
     sema   uint32
 }
-{% endhighlight %}
+```
 
 原先使用了12字节数组来存储状态信息，其中8字节用于64位对齐，另外4个字节浪费了。因此，在后来的版本中被优化了。具体的说明参见[这里](https://github.com/golang/go/issues/19149)。
 
@@ -208,7 +208,7 @@ type WaitGroup struct {
 > 64位系统: (等待计数器)(协程计数器)(信号量)               
 > 其他: (信号量)(等待计数器)(协程计数器)    
 
-{% highlight go %}
+```go
 func (wg *WaitGroup) state() (statep *uint64, semap *uint32) {
     if uintptr(unsafe.Pointer(&wg.state1))%8 == 0 {
         return (*uint64)(unsafe.Pointer(&wg.state1)), &wg.state1[2]
@@ -216,11 +216,11 @@ func (wg *WaitGroup) state() (statep *uint64, semap *uint32) {
         return (*uint64)(unsafe.Pointer(&wg.state1[1])), &wg.state1[0]
     }
 }
-{% endhighlight %}
+```
 
 然后，看下`Add`函数的实现，这里跳过里面关于`race`部分。完整的实现如下
 
-{% highlight go %}
+```go
 func (wg *WaitGroup) Add(delta int) {
     // 获取状态值和信号量
     statep, semap := wg.state()
@@ -260,13 +260,13 @@ func (wg *WaitGroup) Add(delta int) {
         runtime_Semrelease(semap, false, 0)
     }
 }
-{% endhighlight %}
+```
 
 `Done`方法就不介绍了，他执行的就是`Add(-1)`。
 
 最后，看下`Wait`方法的实现
 
-{% highlight go %}
+```go
 func (wg *WaitGroup) Wait() {
     // 获取状态
     statep, semap := wg.state()
@@ -294,7 +294,7 @@ func (wg *WaitGroup) Wait() {
         }
     }
 }
-{% endhighlight %}
+```
 
 如上，就是整个`sync.WaitGroup`包实现原理。
 

@@ -31,21 +31,21 @@ categories: linux
 
 系统安装之后，就是连接网络。找根网线连接路由器就OK了。然后到路由器管理界面，找到树莓派的IP地址。之后，就可以使用ssh连接测试了
 
-{% highlight shell %}
+```shell
 ssh pi@192.168.1.104
-{% endhighlight %}
+```
 
 树莓派默认的用户名是`pi`，密码是`raspberry`，主机名是`raspberrypi`。
 
 因为我家的房间没有有线，所以还得配置树莓派使用wifi连接方式。执行如下命令扫描wifi列表
 
-{% highlight shell %}
+```shell
 iwlist wlan0 scan
-{% endhighlight %}
+```
 
 注意`ESSID`和`IE: IEEE`字段。前面是wifi名，后面是加密方式等啥的。然后，将wifi连接信息保存到文件中，下次就会自动连接了
 
-{% highlight shell %}
+```shell
 vim /etc/wpa_supplicant/wpa_supplicant.conf
 
 # 将下面的内容加入到文件最后，用空行和上面的内容分开
@@ -53,7 +53,7 @@ network {
     ssid="ziroom"
     psk="wifi_passwd"
 }
-{% endhighlight %}
+```
 
 一切OK的话，网络连接部分就配置好了。
 
@@ -61,10 +61,10 @@ network {
 
 按照上面的过程配置好了之后，就可以跑各种服务了。首先，当然是跑一个Nginx看看效果了。
 
-{% highlight shell %}
+```shell
 sudo apt-get update
 sudo apt-get install nginx
-{% endhighlight %}
+```
 
 浏览器打开树莓派的IP地址`192.168.1.106`，如果看到"welcome nginx !"，那就表明Nginx运行OK了。
 
