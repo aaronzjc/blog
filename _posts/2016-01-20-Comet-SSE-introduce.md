@@ -38,7 +38,7 @@ categories: web
 
 ### 客户端
 
-{% highlight html %}
+```html
 <!DOCTYPE html>
 <html>
   <head>
@@ -61,11 +61,11 @@ categories: web
     </script>
   </body>
 </html>
-{% endhighlight %}
+```
 
 ### 服务器端
 
-{% highlight php %}
+```php
 <?php
 header("Content-Type: text/event-stream");
 header("Cache-Control: no-cache");
@@ -77,7 +77,7 @@ for ($i=10; $i>2; $i--)
     flush();
     sleep(1);
 }
-{% endhighlight %}
+```
 
 ## WebSocket
 

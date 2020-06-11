@@ -24,11 +24,11 @@ categories: web
 
 这里使用swoole来编写Websocket服务器。[swoole](http://wiki.swoole.com/)是一个高性能的PHP网络通信扩展。很强大。
 这里，建立一个Laravel自定义命令，来管理server。
-{% highlight shell %}
+```shell
 $ php artisan make:command SwooleServer
-{% endhighlight %}
+```
 服务器端值得注意的是，需要用到一个全局的数据结构来管理用户，和用户的连接，当用户刷新浏览器之后，需要更新一下用户key绑定的连接符。这样，当消息再次到达时，能够准确的发送出去。
-{% highlight php %}
+```php
 <?php
 
 $server = new Server('0.0.0.0', 9501);
@@ -63,12 +63,12 @@ $server->on('close', function($server, $fd){
 });
 
 $server->start();
-{% endhighlight %}
+```
 
 ### 客户端
 
 客户端只需要在页面加载时，连接Websocket服务器，然后，在接收到消息时，更新页面：
-{% highlight javascript %}
+```javascript
 // client.js
 var socket = new WebSocket('ws://localhost:9501/?uid=1');
 socket.onopen = function(event) {
@@ -86,7 +86,7 @@ socket.onmessage = function(event) {
 socket.onclose = function(event) {
     console.log("Closed..");
 }
-{% endhighlight %}
+```
 
 ### PHP应用程序
 
@@ -94,12 +94,12 @@ PHP应用程序产生消息之后，需要发送给Websocket服务器。这里�
 
 PHP发送消息需要用到PHP的Websocket客户端库来连接，发送消息。有些实现很简单，这里我使用的是这个库[websocket-php](https://github.com/Textalk/websocket-php)。发送消息代码：
 
-{% highlight php %}
+```php
 <?php
 $cli = new WebsocketClient('ws://localhost:9501');
 if (!$cli) {echo 'Connect Error!';exit;}
 $cli->send(json_encode($msg->toArray(), JSON_UNESCAPED_UNICODE));
-{% endhighlight %}
+```
 
 ### Demo展示
 

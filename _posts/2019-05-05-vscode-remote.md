@@ -27,24 +27,24 @@ VSCode远程开发组件包括3个扩展
 
 首先新建一个空仓库，然后，在你的测试机上clone这个代码库
 
-{% highlight shell %}
+```shell
 $ git clone git@github.com:aaronzjc/remote-ssh-demo.git
 $ pwd
 /home/memosa/remote-ssh-demo
-{% endhighlight %}
+```
 
 ### 配置ssh免密登录
 
 配置免密码登录
 
-{% highlight shell %}
+```shell
 $ ssh-copy-id -i ~/.ssh/id_rsa.pub memosa@IP
 $ 输入登录密码
-{% endhighlight %}
+```
 
 配置别名登录
 
-{% highlight shell %}
+```shell
 $ vim ~/.ssh/config
 # file ~/.ssh/config
 Host dev
@@ -52,7 +52,7 @@ Host dev
     Port 22
     User root
     IdentityFile ~/.ssh/id_rsa
-{% endhighlight %}
+```
 
 ### 安装&配置&示例
 

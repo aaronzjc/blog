@@ -14,7 +14,7 @@ categories: web
 
 管道的过程就是，将前一个的操作输出作为第二个操作的输入，这样不断的执行，直到最后一个操作执行完成。用代码表示就是如下
 
-{% highlight php %}
+```php
 <?php
 $stages = [stageOne, stageTwo, stageThree];
 $payload = Input;
@@ -24,7 +24,7 @@ foreach ($stages as $stage) {
 }
 
 echo $payload;
-{% endhighlight %}
+```
 
 将上面的代码放大，实现一个完善的管道过程，只要做这么几件事：
 
@@ -35,7 +35,7 @@ echo $payload;
 
 最后实际的使用效果是这样的
 
-{% highlight php %}
+```php
 <?php
 spl_autoload_register();
 
@@ -63,7 +63,7 @@ $pipeOne->pipe($stageOne)->pipe($stageTwo);
 $pipeline = new Pipeline();
 $result = $pipeline->pipe($pipeOne)->pipe([Stage::class, "stageOne"])->pipe([Stage::class, "stageTwo"])->process(10);
 echo $result; // 101->stageOne->stageTwo
-{% endhighlight %}
+```
 
 我模仿`league\pipeline`实现的代码在[这里](https://github.com/aaronzjc/Personal_Toys/tree/master/BlogDemos/pipeline)。主要不同的是，league里面添加中间处理是复制的$this，我觉得用链式调用会更好一点。
 
@@ -73,7 +73,7 @@ echo $result; // 101->stageOne->stageTwo
 
 Laravel请求的处理函数在`Illuminate\Foundation\Http::handler()`中，再进一步剔除无关代码，最后实际的请求处理代码如下
 
-{% highlight php %}
+```php
 <?php
 protected function sendRequestThroughRouter($request)
 {   
@@ -88,13 +88,13 @@ protected function sendRequestThroughRouter($request)
                 ->through($this->app->shouldSkipMiddleware() ? [] : $this->middleware)
                 ->then($this->dispatchToRouter());
 }
-{% endhighlight %}
+```
 
 上面的代码中，`send`方法和`through`做一些初始化相关的事情。真正的中间件流程在`then`方法中。
 
 `then`方法的代码异常复杂，什么返回匿名函数里面再返回匿名函数。这里，根据框架里面的代码来理解太复杂了。我自己写了一个精简化的demo，剔除了和框架相关的东西，只保留了Laravel中间件核心理解的部分。
 
-{% highlight php %}
+```php
 <?php
 // 中间件定义
 $pipes = [
@@ -125,11 +125,11 @@ $re = array_reduce($pipes, function($stack, $pipe){
 },$init);
 // 中间件执行
 call_user_func($re, "fuck");
-{% endhighlight %}
+```
 
 `array_reduce`就是执行完成之后返回三个包裹函数
 
-{% highlight php %}
+```php
 <?php
 // wrapper3
 function wrapper3($pass) use($wrapper2, $pipe3) {
@@ -151,7 +151,7 @@ function wrapper0($args){
 
 // 执行入口
 call_user_func($wrapper3, "hello");
-{% endhighlight %}
+```
 
 按照如上的拆分走下来，就形成一条流水线了。主要是通过`$callback($args)`串起来的。真的有点绕的，但是本质还是和最开始的一样，根据一个数组，然后线性的一个一个过程的执行。
 

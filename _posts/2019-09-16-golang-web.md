@@ -38,7 +38,7 @@ Github仓库有dev和master两个分支。因为项目ci/cd是基于master分支
 
 makefile内容很简单，构建两个可执行文件，放到项目bin目录。
 
-{% highlight text %}
+```text
 GO111MODULE=on
 .PHONY: crawler
 crawler:
@@ -49,13 +49,13 @@ mu:
 .PHONY: clean
 clean:
    -rm ./bin/*
-{% endhighlight %}
+```
 
 值得注意的细节是，这里要开启`CGO_ENABLED=0`，即静态编译。因为，最终应用是打包成镜像执行。为了维持镜像大小，使用的是alpine基础容器。这个容器里面没有标准Go运行环境，如果不使用静态编译，会执行失败，报`exec user … not found`的错误。
 
 CI/CD工具使用的是自建的Drone。之前写过好几篇关于Drone的文章了，也算比较熟悉。也可以使用其他自己比较熟悉的工具。
 
-{% highlight yaml %}
+```yaml
 kind: pipeline
 name: default
 
@@ -105,7 +105,7 @@ steps:
 trigger:
   branch:
     - master
-{% endhighlight %}
+```
 
 CI/CD一共分4个步骤。构建，执行make生成两个可执行文件。注意，这里需要使用带make工具的景象；打包镜像，因为两个Dockerfile非常相似，这里使用Docker的分阶段构建，构建两个镜像；部署，直接使用插件，ssh到服务器执行目录，启动服务。
 
@@ -117,7 +117,7 @@ CI/CD一共分4个步骤。构建，执行make生成两个可执行文件。注�
 
 上面介绍完Drone自动化构建部署。最后，介绍下具体是怎么部署运行的。之前提到过，应用最终是通过Docker运行的。所以，首先需要打包一个Docker镜像。
 
-{% highlight dockerfile %}
+```dockerfile
 FROM alpine:3.7 as crawler
 ENV APP_ENV production
 RUN apk add --no-cache ca-certificates tzdata && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
@@ -135,21 +135,21 @@ COPY ./public /app/public
 WORKDIR /app
 EXPOSE 7980
 CMD ["./mu"]
-{% endhighlight %}
+```
 
 打包镜像很简单，将前面编译出来的可执行文件，放到指定目录，然后执行。启动容器方式也很简单
 
-{% highlight shell %}
+```shell
 docker run -d -v /path/to/app.json:/app/app.json image_name:tag app_crawler
 docker run -d -p 7980:7980 -v /path/to/app.json:/app/app.json image_name:tag app_mu
-{% endhighlight %}
+```
 
 用这种方式去部署没问题，也可以使用其他方式，例如k8s等。我这里图简单，是使用Swarm+DockerStack的方式来部署的。
 
 关于swarm如何部署，可以阅读文档直接在命令行下部署。我使用的是一个开源管理软件`Portainer`。首先在Portainer上建好`app.json`
 配置文件，然后建立这么一个stack部署文件，再发布就好了
 
-{% highlight yaml %}
+```yaml
 version: '3.7'
 services:
   crawler:
@@ -171,7 +171,7 @@ services:
 configs:
   app_mu_config:
     external: true
-{% endhighlight %}
+```
 
 容器启动以后，还需要部署一个nginx在前面做反向代理，将域名请求代理到服务上。这里我并没有在后端服务上去支持https，而是在nginx这一层做的https处理。
 

@@ -12,7 +12,7 @@ Gin是基于net/http库开发的一个Web框架，里面包含了路由组件，
 
 如下是用官方库net/http开发的一个最基础的HTTP服务。首先，添加路由处理，然后监听端口。Gin是基于这个包开发的一个Web框架，底层的执行依然如此。只是他包装了路由注册，路由查找，中间件等常用组件。更加方便，规范化了。所以本文会介绍几个核心组件的原理。
 
-{% highlight go %}
+```go
 package main
 
 import "net/http"
@@ -25,12 +25,12 @@ func main() {
    http.HandleFunc("/", hello)
    http.ListenAndServe(":8899", nil)
 }
-{% endhighlight %}
+```
 
 ### Gin的中间件实现
 
 中间件本质就是一个流水线处理，将一组处理方法作用于一个对象。最简单的实现就是一个数组遍历执行；复杂的就像laravel的中间件。Gin的中间件实现也是非常的简洁优雅
-{% highlight go %}
+```go
 package main
 
 import "fmt"
@@ -96,13 +96,13 @@ func main() {
    // 启动执行
    c.Next() 
 }
-{% endhighlight %}
+```
 
 ### Gin中的Context优化
 
 HTTP服务通常会支持高并发，Gin也是强调自己的并发能力。分析一个请求，当一个HTTP请求到达Gin这里时，首先进入到serveHTTP方法里面。然后Gin会在这里初始化当前请求的Context。如果当并发特别高的时候，Context会初始化很多很多次，这样，占用的内存会很高。其次，当请求处理完以后，GC又会销毁Context对象，又会造成比较频繁的GC处理。Gin使用了sync.Pool来缓存Context对象，降低了GC压力。
 
-{% highlight go %}
+```go
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
    c := engine.pool.Get().(*Context)
    c.writermem.reset(w)
@@ -111,7 +111,7 @@ func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
    engine.handleHTTPRequest(c)
    engine.pool.Put(c)
 }
-{% endhighlight %}
+```
 
 如上所示，当处理时，首先从P取一个Context对象，这里重置一次，避免拿到其他的请求的数据。然后使用完了，再放回去，非常标准。很多其他的框架都有类似的处理。
 
@@ -122,7 +122,7 @@ Go的框架一般都比较简单。自身处理的东西其实不是很多，对
 Gin框架的路由使用的一种前缀树，又叫radix tree，基数树，压缩前缀树等。是一个更加节省空间的字典树。补充下基础知识，先学习一下Trie。
 字典树，就是将关键词构造成一个树结构。可以很高效的查找给定字符串，搜索补全等。
 
-{% highlight text %}
+```text
 abc
 abd
 ace
@@ -136,11 +136,11 @@ abcdef
         |- e
           |- f
     |- d
-{% endhighlight %}
+```
 
 对于如上的字符串，可以构造一个字典树。当查询的时候，效率就很高。但是这样的结构有一个缺点，就是，非常占内存空间。每个字符都占用了一个节点。所以这个是典型的以空间换时间。基础的Trie实现如下
 
-{% highlight go %}
+```go
 package main
 
 import (
@@ -278,11 +278,11 @@ func main() {
    fmt.Println()
    Reverse(t.Root)
 }
-{% endhighlight %}
+```
 
 对于空间占用和查询效率的问题，提出的改进就是下面要提到的压缩字典树了。他做的改进就是将，图中连续的单节点进行合并，合并之后的效果如下：
 
-{% highlight text %}
+```text
 >abd
 >ace
 >abcdef
@@ -292,10 +292,10 @@ func main() {
   |- b 
     |- cdef
     |- d
-{% endhighlight %}
+```
 
 很好理解，如果连续的单节点。说明搜索路径是唯一的，自然可以合并成一个串，只保留一个节点。Gin框架就是采用的这个数据结构来存储路由。大致实现如下
-{% highlight go %}
+```go
 package main
 
 import "fmt"
@@ -461,7 +461,7 @@ func main() {
    t.root.addMyRoute("/abf")
    Reverse(t.root)
 }
-{% endhighlight %}
+```
 
 事实上，Gin的路由还做了一些其他的处理，例如参数路由，模式匹配等。这个可以查阅源码去了解。
 
@@ -471,7 +471,7 @@ func main() {
 
 有如下一个标准的基于Gin的Web应用，看看应用启动和请求处理流程。
 
-{% highlight go %}
+```go
 package main
 
 import "github.com/gin-gonic/gin"
@@ -485,7 +485,7 @@ func main() {
         })
         r.Run() // 监听并在 0.0.0.0:8080 上启动服务
 }
-{% endhighlight %}
+```
 
 整个请求过程如图
 

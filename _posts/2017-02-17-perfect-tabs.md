@@ -19,7 +19,7 @@ categories: web
 ## 封装成Vue组件
 很容易就想到一个Tab组件涉及的逻辑。外层传递一个Tab项的列表给这个组件，组件渲染结果，点击Tab项，切换不同的Tab。初步的封装，代码如下
 
-{% highlight xml %}
+```xml
 <template id="super-tab">
 <div class="super-tab">
    <div class="tab-item" v-for="tab,index in tabs" @click="tabSwitch(index)" :class="{'on': active == tab.id}>
@@ -46,7 +46,7 @@ var VTab = Vue.extend({
     }
 });
 </script>
-{% endhighlight %}
+```
 
 ## 进一步思考
 上面的代码封装了一个基础的Tab，能够满足一定的场景了。但是可配置性很弱。例如，一个Tab可能是上图标，下文字的形式；又或者，是两行文字的形式。因此，最好是能够让tab-item-content的这一部分自定义。
@@ -55,7 +55,7 @@ var VTab = Vue.extend({
 
 因此，改良之后的Tab如下
 
-{% highlight xml %}
+```xml
 <template id="super-tab">
 <div class="super-tab">
    <div class="tab-item" v-for="tab,index in tabs" @click="tabSwitch(index)" :class="{'on': active == tab.id}">
@@ -68,18 +68,18 @@ var VTab = Vue.extend({
 <script>
 // No Changes
 </script>
-{% endhighlight %}
+```
 
 实际应用，是这样的
 
-{% highlight xml %}
+```xml
 <v-tab :tabs="tabs" :current="current">
     <template slot="item" scope="props">
         <div class="icon" :class="[props.tab.icon]"></div>
         <div class="title">{{ props.tab.text }}</div>
     </template>
 </v-tab>
-{% endhighlight %}
+```
 
 至此，一个扩展性良好的Tab组件就完成了。
 

@@ -13,7 +13,7 @@ categories: deep-in
 
 如下是按照Redis中原始c实现，写了个Go版本
 
-{% highlight golang %}
+```golang
 var (
 	m uint32 = 0x5bd1e995
 	r uint32 = 24
@@ -51,7 +51,7 @@ func MurmurHash2(data []byte, seed uint32) uint32 {
 
 	return h
 }
-{% endhighlight %}
+```
 
 实话实说，看到这个方法，有点懵。知道每一个步骤是啥，但是连在一起就看不懂了。不知道这一通乘，移位，异或运算的根据在哪里。后续再深入了解吧。
 
@@ -61,7 +61,7 @@ func MurmurHash2(data []byte, seed uint32) uint32 {
 
 假设有一个32位的串x，有这么一个输入串xx。针对循环中的hash计算如下
 
-{% highlight text %}
+```text
 # 因为x相同，所以这一段的内容不变
 x *= m
 x ^= x >> r
@@ -72,17 +72,17 @@ h *= m
 h ^= x
 h *= m
 h ^= x
-{% endhighlight %}
+```
 
 现在，假设m = 1，上面的这段计算就变成了
 
-{% highlight text %}
+```text
 x ^= x >> r
 
 # 两次异或等于本身
 # h ^= x
 # h ^= x
-{% endhighlight %}
+```
 
 即，最终的hash值和输入的串没有任何关系。最终都是一个值。不过，实际中，m的值不可能是1。那是不是m不等于1就没有问题了呢？作者经过测试，给出了答案。就算m不等于1，也还是会有一些hash值有问题。
 
