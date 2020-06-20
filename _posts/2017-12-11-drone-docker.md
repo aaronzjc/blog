@@ -56,11 +56,11 @@ Registry上面介绍过了，是用来存放镜像的地方。类似于Github的
 
 控制面板：产品服务-->容器服务
 
-![阿里云]({{ site.url }}/assert/imgs/docker_1.png)
+![阿里云](/assert/imgs/docker_1.png)
 
 进入到个人容器管理平台
 
-![阿里云]({{ site.url }}/assert/imgs/docker_2.png)
+![阿里云](/assert/imgs/docker_2.png)
 
 这样我们就拥有了一个自己的Registry。以后的镜像就可以推送到这个仓库了。
 
@@ -128,7 +128,7 @@ pipeline:
 
 Drone实际运行的效果就是下面这样的
 
-![Drone]({{ site.url }}/assert/imgs/docker_3.png)
+![Drone](/assert/imgs/docker_3.png)
 
 Drone其中有些不太方便的点
 
