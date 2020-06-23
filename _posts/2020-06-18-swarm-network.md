@@ -17,7 +17,7 @@ categories: linux
 
 ## 网络基础
 
-本文会介绍，Docker网络涉及到的知识。主要包括`netns`，`iptables`，`vlan`，`vxlan`。
+本文会介绍Docker网络中涉及到的知识，也是自己之前不太熟悉的内容。主要包括`netns`，`iptables`，`vlan`，`vxlan`。在下一篇中，才会真正介绍Docker的网络。
 
 ### Network Namespace
 
@@ -173,11 +173,11 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 #### 基本介绍
 
-`iptables`是运行在用户空间的应用软件，对linux内核`netfilter`模块的封装。主要用于网络数据包管理和转发，可以实现对数据包过滤，转发，修改，以及`NAT`等功能。
+`netfilter`是linux内核提供的防火墙功能，它可以对网络数据包过滤和修改。而`iptables`，则是运行在用户空间的应用软件，是对`netfilter`的封装。`netfilter`提供了5个钩子来让其他程序针对数据包特定阶段进行处理，分别时`PREROUTING`，`INPUT`，`FORWARD`，`OUTPUT`，`POSTROUTING`。
 
-它主要包含`table-表`，`chain-链`，`rule-规则`，`target-动作`这几个概念。
+`iptables`定义了一套自己的规则系统，主要包含`table`，`chain`，`rule`，`target`这几个概念。
 
-其中，表指不同的数据处理流程，例如，用于数据过滤的`filter`表，用于`NAT`的`nat`表，以及用于修改数据包的`mangle`表。每张表又包含多个链，链是一系列规则的合集，从上往下依次匹配。当匹配到指定的规则，执行对应的动作。通常，每个链有一个默认策略。当链中所有规则执行完毕没有跳走，则执行默认的策略。
+其中，`table`指不同的数据处理流程，例如，用于数据过滤的`filter`表，用于`NAT`功能的`nat`表，以及用于修改数据包的`mangle`表等。每张`table`又包含多个`chain`，`chain`是一系列`rule`的合集，从上往下依次匹配。当匹配到指定的`rule`，执行对应的`target`。通常，每个`chain`有一个默认`policy`。当`chain`中所有`rule`执行完毕没有跳走，则执行默认的`policy`。
 
 `iptables`包含如下4个表，表中包含了几个默认链
 
@@ -197,155 +197,81 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 >   + OUTPUT
 >
 
-每个表虽然包含的链名字相同，但是彼此没有关联。唯一的相同点，就是在数据包流动中的特定步骤。各个链对应的数据包处理步骤如图
+每个表虽然包含的链名字相同，但是彼此没有关联。唯一的相同点，就是之前提到的`netfilter`中的特定阶段。数据包在`netfilter`中的流转如图
 
 ![图片](/assert/imgs/iptables_flow.png)
 
-接下来会分析一个实际例子，理解它的处理逻辑；然后，再根据实际需求，自己去建一个规则。
 
-看下Docker的默认`iptables`配置
+#### 流程图说明
 
-```shell
-# 执行iptables-save打印所有的表
-$ iptables-save
-...
-*filter
-:INPUT ACCEPT [668:52089]
-:FORWARD DROP [0:0]
-:OUTPUT ACCEPT [431:46901]
-:DOCKER - [0:0]
-:DOCKER-ISOLATION-STAGE-1 - [0:0]
-:DOCKER-ISOLATION-STAGE-2 - [0:0]
-:DOCKER-USER - [0:0]
--A FORWARD -j DOCKER-USER
--A FORWARD -j DOCKER-ISOLATION-STAGE-1
--A FORWARD -o docker0 -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
--A FORWARD -o docker0 -j DOCKER
--A FORWARD -i docker0 ! -o docker0 -j ACCEPT
--A FORWARD -i docker0 -o docker0 -j ACCEPT
--A DOCKER-ISOLATION-STAGE-1 -i docker0 ! -o docker0 -j DOCKER-ISOLATION-STAGE-2
--A DOCKER-ISOLATION-STAGE-1 -j RETURN
--A DOCKER-ISOLATION-STAGE-2 -o docker0 -j DROP
--A DOCKER-ISOLATION-STAGE-2 -j RETURN
--A DOCKER-USER -j RETURN
-COMMIT
-*nat
-:PREROUTING ACCEPT [1:60]
-:INPUT ACCEPT [1:60]
-:OUTPUT ACCEPT [124:8795]
-:POSTROUTING ACCEPT [124:8795]
-:DOCKER - [0:0]
--A PREROUTING -m addrtype --dst-type LOCAL -j DOCKER
--A OUTPUT ! -d 127.0.0.0/8 -m addrtype --dst-type LOCAL -j DOCKER
--A POSTROUTING -s 172.17.0.0/16 ! -o docker0 -j MASQUERADE
--A DOCKER -i docker0 -j RETURN
-COMMIT
-```
+怎么理解上面的这个流转图呢？分两种情况，一种是外部进来；另一种是本地进程发出。
+
+1、外部进来
+
+首先，看左上角的注释，分为`Network Level`和`Bridge Level`。前面简单提过`bridge`的概念，用于在linux主机模拟二层交换机。linux为了实现网络虚拟化，实现了一系列模拟硬件设备，例如，`bridge`，`veth`等。
+
+如果没有`bridge`的话，网络包的处理比较单一，从网卡进来后，进入网络层。引入`bridge`后，就需要在二层判断是否是发送给`bridge`的，然后，经由`bridge`转发。
+
+从左往右梳理，当一个数据包从物理网卡进入，经过检查，发现它属于网桥接口。则数据包不会走`T`往上进入网络层，而是继续在网桥处理。从图可以看到，依次经过`iptables`中的`nat-prerouting`，`raw-prerouting`。之后，进入一个特殊的流程`conntrack`。
+
+`conntrack`是什么？这么理解，通常，我们的主机对外只会暴露极少量几个端口。外部访问主机时，非指定端口的数据都会被抛弃。但是，当主机的进程与外部进行连接通信时，它会随机选择一个端口进行连接。这时候，返回的数据如果按照之前的逻辑，则会被抛弃，无法通信。`conntrack`提供了一种能力，可以根据连接状态进行数据包处理。
+
+再然后，数据包来到了`mangle-prerouting`和`nat-prerouting`链。接着，又是一个`bridge decision`。这个时候的处理，就类似于交换机的处理过程了，`bridge`会判断数据包的mac地址
+
++ 如果是发往某个设备的，则查mac地址，进行转发。有mac记录，则直接转发，否则arp查找，转发。
++ 如果是发给网桥自身，或者目的地址不是网桥，则交给上层协议处理。
+
+后面的流程，就是按照图中的步骤依次处理，就不介绍了。
+
+2、进程发出
+
+从进程发出的数据包，直接看最上面的`local process`即可。首先经过各个表中的`OUTPUT`链，接着路由，然后就是`POSTROUTING`链，最后发出。
+
+3、SNAT和DNAT
+
+在`POSTROUTING`中，有一个有意思的地方，就是`SNAT`。当容器内访问外网时，需要经过一次源IP转换。因为，接收方根据源IP回复时，没办法路由到内网IP。所以需要将源IP转换成出口IP。这里，又有一个情况，如果出口IP不是固定的呢，这样转换就有些棘手了。在`SNAT`中，有一个特殊动作叫`MASQUERADE`，就是动态设置源IP为出口IP。
+
+有对源IP转换，就有对目的IP进行转换。当容器请求外部，因为发出的包经由SNAT修改为网卡IP了。现在回复的数据包到了网卡，还需要还原，才能正确发送给容器。
+
+参考资料
+
++ [netfilter介绍](https://opengers.github.io/openstack/openstack-base-virtual-network-devices-bridge-and-vlan/#bridge%E4%B8%8Enetfilter)
 
 ### vlan和vxlan
 
-## Docker容器网络
+下面，介绍`vlan`和`vxlan`相关的知识。从总体来理解，`vlan`和`vxlan`都是二层相关技术。
 
-### Host
+#### vlan
 
-![图片](/assert/imgs/docker_net_host2.png)
+我们知道，`LAN`是由几台机器组成的网络。例如，在一个公司，多个部门之间的机器通过交换机就组成了一个`LAN`。但是，二层交换机只构成单一广播域。对于如下的拓扑结构
 
-#### 实践
+![图片](/assert/imgs/docker_net_basic4.png)
 
-```shell
-host#docker run -d --name demo --net host busybox sleep 3600 
-host#ip link
-1: lo: ...
-2: eth0: ...
-3: docker0: ...
-host#docker exec -it demo ip link
-1: lo: ...
-2: eth0: ...
-3: docker0: ...
-```
+当主机`a`想要和`c`通信时，会发送数据包给交换机`B`。`B`如果没有记录`c`的地址，则会发送arp请求给所有的端口查询`c`的mac地址，包括`A`。`A`同样会转发到`B`去查询。如果一个局域网下的机器非常多的化，这样就会造成泛洪，导致网络充斥着这些数据包。所以提出了`vlan`，进一步划分子网。`vlan`的作用
 
-### Bridge
++ 广播控制
++ 带宽利用
++ 降低延迟
++ 安全(非设计作用，因为隔离机制附加)
 
-![图片](/assert/imgs/docker_net_bridge1.png)
+`vlan`并不依赖特定的物理设备来实现，你可以在一个交换机上划分出多个`vlan`。但是，不同的`vlan`之间是无法通信的，即使是在同一个交换机之上划分。不同的`vlan`之间想要通信，需要使用三层设备，可以是路由器或者三层交换机。
 
-#### 实践
-```shell
-# 查看Docker默认的网桥
-host#ip addr | grep docker0
-5: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default 
-    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
+`vlan`原理和实现方式
 
-# 启动两个容器
-host#docker run -d --name C0 busybox sleep 3600
-host#docker run -d --name C1 busybox sleep 3600
++ 物理层。直接根据交换机的端口来作为划分`vlan`。显然，这种情况适合较小规模的组织。
++ 数据链路层。根据每台主机的MAC地址来划分。这种情况，需要有一个数据库来存储MAC地址和VLAN ID的映射关系。配置相对复杂。
++ 网络层。根据每台设备的IP地址来划分，以子网作为划分的依据。
 
-# 查看此时宿主机的网络设备
-host#ip addr show
-5: docker0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default 
-    link/ether 02:42:19:92:73:ba brd ff:ff:ff:ff:ff:ff
-    inet 172.17.0.1/16 brd 172.17.255.255 scope global docker0
-7: vethc00ed59@if6: ... 
-9: vetheab08d9@if8: ... 
+目前最常用的vlan技术是`8021.Q VLAN`，具体的细节可以看[这个技术文档](https://project-homedo.oss-cn-shanghai.aliyuncs.com/product_attachment/100237945_IEEE%20802.1Q%20VLAN%E6%8A%80%E6%9C%AF%E7%99%BD%E7%9A%AE%E4%B9%A61.0.1.pdf)。
 
-# 查看容器C0和C1的网卡信息
-C0#ip addr show
-6: eth0@if7: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
-    link/ether 02:42:ac:11:00:02 brd ff:ff:ff:ff:ff:ff
-    inet 172.17.0.2/16 brd 172.17.255.255 scope global eth0
-C1#ip addr show
-8: eth0@if9: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
-    link/ether 02:42:ac:11:00:03 brd ff:ff:ff:ff:ff:ff
-    inet 172.17.0.3/16 brd 172.17.255.255 scope global eth0
-```
+大致是在标准的以太网帧源MAC地址和目的MAC地址后插入了4字节的`vlan tag`作为标识。其中，作为唯一标识的`vlan ID`只有12位，取值在1～4094。可以看出，其实`vlan`的范围也不太大。当二层接收到以太网帧时，会去解析是否包含`vlan tag`，如果包含，则会发送给指定的`vlan`。
 
-#### 自定义Bridge
+#### vxlan
 
-```shell
-# 创建一个自定义的网桥
-host#docker netowork create -d bridge --subnet 192.168.0.0/24 mybridge
-host#docker network ls
-NETWORK ID          NAME                DRIVER
-84dcfa90bc26        bridge              bridge
-504fe4ba30e7        mybridge            bridge
-...
 
-# 启动两个容器，并连接到自定义的网桥
-host#docker run -d --name D0 --net mybridge busybox sleep 3600
-host#docker run -d --name D1 --net mybridge busybox sleep 3600
 
-# 查看下网络命名空间
-host#ip netns ls
-752b54bc8316 (id: 3)
-bcda1ab21d9d (id: 2)
-d1fb83738e70 (id: 1)
-0b11f8681598 (id: 0)
-default
+参考资料
 
-# 查看新启动的容器网络信息
-host#docker exec -it D0 ip addr 
-12: eth0@if13: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
-    link/ether 02:42:c0:a0:00:02 brd ff:ff:ff:ff:ff:ff
-    inet 192.160.0.2/24 brd 192.160.0.255 scope global eth0
-host#docker exec -it D1 ip addr 
-12: eth0@if13: <BROADCAST,MULTICAST,UP,LOWER_UP,M-DOWN> mtu 1500 qdisc noqueue 
-    link/ether 02:42:c0:a0:00:02 brd ff:ff:ff:ff:ff:ff
-    inet 192.160.0.3/24 brd 192.160.0.255 scope global eth0
-
-# 查看路由信息
-host#ip route
-default via 10.0.3.1 dev enp0s8 proto static metric 101 
-172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 
-192.160.0.0/24 dev br-504fe4ba30e7 proto kernel scope link src 192.160.0.1
-...
-
-# 查看iptables
-host#iptables -t nat -L
-...
-Chain POSTROUTING (policy ACCEPT)
-target     prot opt source               destination         
-MASQUERADE  all  --  192.160.0.0/24       anywhere            
-MASQUERADE  all  --  172.17.0.0/16        anywhere
-...
-```
-
-### overlay
++ [图文并茂VLAN](https://cloud.tencent.com/developer/article/1412795)
++ [vxlan介绍](https://forum.huawei.com/enterprise/zh/thread-334207.html)
++ [Linux实现vxlan网络](https://cizixs.com/2017/09/28/linux-vxlan/)
