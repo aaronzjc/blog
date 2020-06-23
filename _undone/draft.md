@@ -17,17 +17,14 @@
 
 `vxlan`怎么工作？
 
-`vxlan`使用`mac in udp`方式，将二层的数据封装成UDP数据包，然后在三层网络中传输。采用`4789`作为通信的端口号。这种`mac in udp`方式也并不是首创，很多隧道通信协议都采用这种方式。
+`vxlan`使用`mac in udp`方式，将二层的数据封装成UDP数据包，通过`4789`端口，在三层网络中传输。这种`mac in udp`方式也并不是首创，很多隧道通信协议都采用这种方式。它具体的封装结构如图(来自：[https://support.huawei.com/enterprise/en/doc/EDOC1100004365/f95c6e68/vxlan-packet-format](https://support.huawei.com/enterprise/en/doc/EDOC1100004365/f95c6e68/vxlan-packet-format))
 
-和`vlan`类似，`vxlan`也有一个唯一标识来区分各个子网，叫`vxlan vni`。它有24位空间，解决了空间不足的问题。此外，`vxlan`需要利用`vtep`设备做封包和解包。`vtep`设备可以是物理交换机，也可以是虚拟的网络设备。
+![img](/assert/imgs/docker_net_basic5.png)
 
-前面提过，`vxlan`是利用三层网络来实现逻辑二层网络。那么二层网络通信需要考虑的问题，`vxlan`必须也要能支持。例如，单播，多播和广播等。同一个`vlan`下的设备，是可以直接两两通信的。在`vxlan`下，主机在不同的子网，依赖`vtep`通信，所以必须两两通过`vtep`连接。
+类似`vlan`，`vxlan`通过24位的`vni`来标识子网，解决了空间不足的问题。相同`vni`构成的一个虚拟大二层网络叫`Bridge-Domain`。`vxlan`需要`vtep`设备做封包和解包。`vtep`设备可以是物理交换机，也可以是虚拟的网络设备。因为`vxlan`是利用三层网络来实现逻辑二层网络。那么`vxlan`也具备`vlan`的一些特征。例如，支持单播，多播和广播等；不同的`vni`之间不能直接通信，需要借助其他的方式来实现。
 
-
-
-
+熟悉了`vxlan`的基本概念，接下来实际操作。实现一个`vxlan`，让两个虚拟机中的Docker容器能够通过`vxlan`通信。大致结构如图
 
 
-[VXLAN vs VLAN](https://zhuanlan.zhihu.com/p/36165475)
 [虚拟网络中的Linux虚拟设备](https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking/)
-[vxlan](https://support.huawei.com/enterprise/zh/doc/EDOC1100087027#ZH-CN_TOPIC_0254803605)
+[什么是vxlan](https://support.huawei.com/enterprise/zh/doc/EDOC1100087027#ZH-CN_TOPIC_0254803605)
