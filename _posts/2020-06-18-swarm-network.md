@@ -7,23 +7,19 @@ categories: linux
 
 ## 简介
 
-最近在折腾Swarm相关的东西。自从将`Mu`拆分后，实现了一台机器上任意扩容。想起自己还有一台腾讯云的1C1G机子，于是，组了一个Swarm集群。
+最近在折腾Swarm相关的东西。自从将`Mu`拆分后，实现了一台机器上任意扩容。想起自己还有一台腾讯云的1C1G机子，于是，组了一个Swarm集群。有了集群以后，就可以进行新的实践了。Swarm和k8s这类编排工具的出现，抹平了服务器之间的差异。只要同属于一个集群，编排工具就可以根据服务器情况将容器放置到集群任意机器。再配置上服务发现，就实现了一个高可用的服务。
 
-有了集群以后，就可以进行新的实践了。Swarm和k8s这类编排工具的出现，抹平了服务器之间的差异。只要同属于一个集群，编排工具就可以根据服务器情况将容器放置到集群任意机器。再配置上服务发现，就实现了一个高可用的服务。当外界访问到这个服务时，内部会自动将流量分发到这些容器。这种模式大大减少了传统扩容机器的工作量，这也是容器技术受欢迎的原因之一。
+这里面的技术知识有很多，我对其中的网络部分很感兴趣。主要好奇，容器如何通信，以及多机器之间的容器通信。于是，学习了下容器的网络知识。
 
-这里面的技术知识有很多，我对其中的网络部分很感兴趣。主要好奇，容器的通信，以及多机器之间的容器通信。
+本文主要介绍Docker网络中涉及到的知识。主要包括`netns`，`iptables`，`vlan`，`vxlan`。
 
-于是带着问题，学习了下Docker网络知识。之前也走马观花看过，这次比较系统的了解了这些内容。重要的对一些内容亲自实践了一番。本文针对`Swarm`集群，`k8s`可能不一样，等日后学习`k8s`时再去了解。
-
-## 网络基础
-
-本文会介绍Docker网络中涉及到的知识，也是自己之前不太熟悉的内容。主要包括`netns`，`iptables`，`vlan`，`vxlan`。在下一篇中，才会真正介绍Docker的网络。
+## 网络知识
 
 ### Network Namespace
 
-`Network Namespace`是网络虚拟化的一个重要功能。它可以创建多个隔离的网络空间，每个网络空间有自己独立的网络栈。和`Network Namespace`类似，也存在其他的`Namespace`类型，将对应的资源隔离，这里就不赘述了。
+`Network Namespace`是网络虚拟化的一个重要功能。它可以创建多个隔离的网络空间，每个网络空间有自己独立的网络栈。
 
-Linux提供`ip`命令来操作和管理网络设备等，非常方便统一。
+linux提供`ip`命令来管理各种网络设备，资源等，非常方便。
 
 ```shell
 ip netns list # 查看所有命名空间
@@ -52,9 +48,11 @@ $ ip netns exec ns2 ip addr
     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
 ```
 
-可以看到，两个网络空间默认都只有一个本地回环网络接口。没有网络接口，就没办法和外界通信。这时候，就需要用到`veth pair`设备了。
+可以看到，两个网络空间默认都只有一个本地回环网络接口。如果要和外界通信，就需要用到`veth pair`设备了。
 
-`veth pair`是虚拟网络设备，总是`成对`出现。可以理解它是用网线连接好了的两个接口。将两个接口放到不同的`Network Namespace`中，就可以实现两个网络空间通信了。在操作`veth pair`时，时时想着，我拿着一根网线，现在要把一头插哪，另一头插哪。闲话少说，动手试试
+`veth pair`是虚拟网络设备，总是`成对`出现。可以理解它是用网线连接好了的两个接口。将两个接口放到不同的`Network Namespace`中，就可以实现两个网络空间通信了。在操作时，时时想着，我拿着一根网线，现在要把一头插哪，另一头插哪。
+
+闲话少说，动手试试
 
 ```shell
 # 1. 创建一对veth pair
@@ -167,13 +165,13 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 如上，介绍了linux下使用`ip`命令管理`Network Namespace`的相关知识。并学会了搭建一个简单的网桥。实际上这个网桥结构就是Docker默认的网络方式。
 
-在上面的实践中，提到了修改`iptables`的相关规则。`iptables`也是linux网络中一个重要的内容。它主要是管理数据包转发，过滤和NAT等。Docker中的`overlay`网络实现也依赖于它。
+在上面的实践中，提到了修改`iptables`的相关规则。`iptables`也是linux网络中一个重要的内容。它主要是管理数据包转发，过滤和NAT等。Docker中的网络实现也依赖于它。
 
 ### iptables
 
 #### 基本介绍
 
-`netfilter`是linux内核提供的防火墙功能，它可以对网络数据包过滤和修改。而`iptables`，则是运行在用户空间的应用软件，是对`netfilter`的封装。`netfilter`提供了5个钩子来让其他程序针对数据包特定阶段进行处理，分别时`PREROUTING`，`INPUT`，`FORWARD`，`OUTPUT`，`POSTROUTING`。
+`netfilter`是linux内核提供的防火墙功能，它可以对网络数据包过滤和修改。`netfilter`提供了5个钩子来让其他程序针对数据包特定阶段进行处理，分别是`PREROUTING`，`INPUT`，`FORWARD`，`OUTPUT`，`POSTROUTING`。`iptables`是运行在用户空间的应用软件，通过对`netfilter`的几个阶段配置来实现管理网络包等。
 
 `iptables`定义了一套自己的规则系统，主要包含`table`，`chain`，`rule`，`target`这几个概念。
 
@@ -218,8 +216,10 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 再然后，数据包来到了`mangle-prerouting`和`nat-prerouting`链。接着，又是一个`bridge decision`。这个时候的处理，就类似于交换机的处理过程了，`bridge`会判断数据包的mac地址
 
-+ 如果是发往某个设备的，则查mac地址，进行转发。有mac记录，则直接转发，否则arp查找，转发。
-+ 如果是发给网桥自身，或者目的地址不是网桥，则交给上层协议处理。
++ 如果目标MAC地址在网桥另一侧，则桥接
++ 如果目标MAC地址未知，则泛洪到所有网桥转发端口
++ 如果目标MAC地址是网桥或者其端口之一的MAC地址，则交给上层处理
++ 如果目标MAC地址位于网桥同一侧，则忽略它
 
 后面的流程，就是按照图中的步骤依次处理，就不介绍了。
 
@@ -231,11 +231,13 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 在`POSTROUTING`中，有一个有意思的地方，就是`SNAT`。当容器内访问外网时，需要经过一次源IP转换。因为，接收方根据源IP回复时，没办法路由到内网IP。所以需要将源IP转换成出口IP。这里，又有一个情况，如果出口IP不是固定的呢，这样转换就有些棘手了。在`SNAT`中，有一个特殊动作叫`MASQUERADE`，就是动态设置源IP为出口IP。
 
-有对源IP转换，就有对目的IP进行转换。当容器请求外部，因为发出的包经由SNAT修改为网卡IP了。现在回复的数据包到了网卡，还需要还原，才能正确发送给容器。
+有对源IP转换，就有对目的IP进行转换。在Docker映射端口时，外网访问宿主机的IP和映射的端口。当数据包到达宿主机后，宿主机则会将目的IP还原，改写成容器的IP。这就是`DNAT`的作用。
 
 #### Docker中的iptables
 
-Docker中的网络实现就利用到了`iptables`。我们看看Docker默认网络驱动`bridge`模式下的`iptables`规则。首先，准备如下的容器
+Docker中的网络就利用到了`iptables`。我们分析下Docker默认网络驱动`bridge`模式下的`iptables`规则。
+
+首先，准备如下的容器
 
 ```shell
 # 启动Docker服务
@@ -257,7 +259,7 @@ $ docker inspect C1
 "IPAddress": "172.17.0.2"
 ```
 
-查看系统路由和`iptables`规则
+查看此时系统路由和`iptables`规则，系统路由用于处理Docker数据包的转发，`iptables`用于地址转换，过滤等。
 
 ```shell
 $ ip route
@@ -303,12 +305,50 @@ COMMIT
 COMMIT
 # Completed on Tue Jun 23 09:57:00 2020
 ```
+为了方便跟踪`iptables`的匹配过程，我们添加两条`iptable`规则用于日志。具体规则逻辑是，如果满足`tcp`协议，且目的端口为`10080`，则记录
 
-接下来，根据Docker的`iptables`规则，对照上面的`netfilter`流程图。看看容器是怎么和外界通信的
+```shell
+$ iptables -t raw -A PREROUTING -p tcp --dport 10080 -j TRACE
+$ iptables -t raw -A OUTPUT -p tcp --dport 10080 -j TRACE
+```
 
-1. 首先，Docker默认网络模式会新建一个`docker0`网桥。当流量进到网卡，经过`bridge check`到达`docker0`。
-2. 接下来，就是`nat-prerouting`链，看看这个链做的事情。根据上面内容，很显然，`nat-prerouting`链默认策略是`accept`。接着，如果时发往本地，则跳到`Docker`对象进行处理。`Docker`是一个自定义链，有两条规则。首先，如果是`docker0`接收到的数据，喔嚯，返回。返回以后，`nat-prerouting`链就匹配完了，执行默认策略`accept`。然后往后走。
-3. 接下来，
+接下来，有两种访问容器服务的方式：一种是外部通过虚拟机的IP和端口去访问；另一种是在虚拟机本地通过`bridge`的IP和端口去访问。这两种方式的区别在于，一个是走虚拟机网卡，对应于流程图中的最左边开始。另一种方式则对应于最上面的`local process`开始。和我们最开始介绍的一致。
+
+```shell
+# 在另一个虚拟机上访问
+$ curl 10.3.0.121:10080
+
+# 在本地访问
+$ curl 127.0.0.1:10080
+```
+
+如下是外部访问时`/var/log/message`的部分精简输出。注意经过`nat-DOCKER`链之后，目的地址就转换成容器的IP了。
+
+```text
+nat:PREROUTING:rule:1           IN=enp0s8 OUT= MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=10.0.3.121 
+nat:DOCKER:rule:2               IN=enp0s8 OUT= MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=10.0.3.121 
+filter:FORWARD:rule:1           IN=enp0s8 OUT=docker0 MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=172.17.0.2 
+filter:DOCKER-USER:return:1     IN=enp0s8 OUT=docker0 MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=172.17.0.2 
+filter:FORWARD:rule:2           IN=enp0s8 OUT=docker0 MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=172.17.0.2 
+filter:DOCKER-ISOLATION-STAGE-1 IN=enp0s8 OUT=docker0 MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=172.17.0.2 
+filter:FORWARD:rule:4           IN=enp0s8 OUT=docker0 MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=172.17.0.2 
+filter:DOCKER:rule:1            IN=enp0s8 OUT=docker0 MAC=08:00:27:70:88:4d:08:00:27:14:b0:13:08:00 SRC=10.0.3.122 DST=172.17.0.2 
+nat:POSTROUTING:policy:3        IN= OUT=docker0 SRC=10.0.3.122 DST=172.17.0.2
+...
+```
+
+如下是本地访问时`/var/log/message`的部分精简输出。注意经过`nat-DOCKER`之后，目的地址就转换成容器的IP了。
+
+```text
+raw:OUTPUT:policy:2         IN= OUT=lo SRC=172.17.0.1 DST=172.17.0.1  
+nat:OUTPUT:rule:1           IN= OUT=lo SRC=172.17.0.1 DST=172.17.0.1  
+nat:DOCKER:rule:2           IN= OUT=lo SRC=172.17.0.1 DST=172.17.0.1  
+filter:OUTPUT:policy:1      IN= OUT=lo SRC=172.17.0.1 DST=172.17.0.2  
+nat:POSTROUTING:policy:3    IN= OUT=docker0 SRC=172.17.0.1 DST=172.17.0.2  
+...
+```
+
+具体日志的输出过程就不解释了，可以看到是和流程图一致的，匹配过程也是对应的。
 
 参考资料
 
@@ -368,8 +408,84 @@ COMMIT
 
 了解了`vxlan`的基本概念，接下来实际操作。实现一个`vxlan`，让两个虚拟机中的Docker容器能够通过`vxlan`通信。大致结构如图
 
+![img](/assert/imgs/docker_net_basic7.png)
+
+首先，我们在两个虚拟机新建一个`bridge`类型网络，并让容器使用此网络
+
+```shell
+# 开启ipv4转发，如果已开启，则忽略
+$ sysctl -w net.ipv4.ip_forward=1
+
+# 虚拟机C1，新建bridge网络。使用192.168.110.0/24，为了区分Docker默认的网段。
+$ docker network create --subnet 192.168.110.0/24 mybridge
+$ ip link 
+$ docker run -itd --name vx --net mybridge --ip 192.168.110.2 busybox
+
+# 虚拟机C2，相同的配置，但是分配一个不同的IP 
+$ docker network create --subnet 192.168.110.0/24 mybridge
+$ ip link 
+$ docker run -itd --name vx --net mybridge --ip 192.168.110.3 busybox
+
+# 在虚拟机C1上，ping C2的容器，显然是ping不通的。
+$ docker exec vx ping 192.168.110.3
+```
+
+接着，我们在两个虚拟机上，搭建一个`vxlan`。然后，让Docker的网络请求走`vxlan`
+
+```shell
+# 虚拟机C1
+$ ip link add vxlan0 type vxlan id 77 remote 10.0.3.122 dstport 4789 dev enp0s8
+$ ip link set vxlan0 master br-asdjflaksdjf(使用ip link 查看mybridge的设备名)
+$ ip link set vxlan0 up
+
+# 虚拟机C2
+$ ip link add vxlan0 type vxlan id 77 remote 10.0.3.121 dstport 4789 dev enp0s8
+$ ip link set vxlan0 master br-asdjflaksdjf(使用ip link 查看mybridge的设备名)
+$ ip link set vxlan0 up
+
+# 此时，再ping一下试试
+$ docker exec vx ping 192.168.110.3
+bingo !
+```
+
 部分参考资料
 
-+ [虚拟网络中的Linux虚拟设备](https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking/)   
++ [虚拟网络中的linux虚拟设备](https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking/)   
 + [什么是vxlan](https://support.huawei.com/enterprise/zh/doc/EDOC1100087027#ZH-CN_TOPIC_0254803605)
-+ [Linux实现vxlan网络](https://cizixs.com/2017/09/28/linux-vxlan/)
++ [Practice VxLAN under linux](https://programmer.help/blogs/practice-vxlan-under-linux.html)
+
+## Docker网络
+
+Docker定义了一套容器网络模型`CNM`(Container Network Model)，包括三个对象，`sandbox`，`endpoint`，`network`。`sandbox`指网络沙盒，每个网络沙盒之间相互隔离，对应于上面的内容，可以是linux下的网络命名空间。也可以是其他技术。`network`指网络，不一定是OSI标准下的网络，可以时`bridge`，也可以是`vlan`。`endpoint`则用于联结`sandbox`和`network`，就像上面介绍的`veth pair`。
+
+`CNM`提供了两个接口`Network Driver`和`IPAM`给用户，方便用户管理网络。前者是具体的网络实现，后者是网络IP地址管理。
+
+Docker网络代码在[这里](https://github.com/moby/libnetwork)。它默认提供了如下几个网络驱动
+
+1. None
+
+此驱动下，容器只有自己基本的网络栈，不包含其他任何配置。完全和外界隔离。
+
+2. host
+
+这种驱动，是将容器的端口映射到宿主机。它直接使用宿主机的网络接口。
+
+3. bridge 
+
+`bridge`是Docker默认的网络驱动。它的是通过`netns`，`bridge`，`iptables`实现通信，正如我们上面所介绍。它的结构也和`netns`中实践的一模一样。
+
+4. overlay
+
+Docker Swarm中的网络驱动，相对复杂。它基于`vxlan`技术，提供了容器跨主机通信的能力。
+
+5. macvlan
+
+新的网络虚拟化技术。这个还没深入了解。
+
+关于Docker网络驱动部分，这里都是一句话带过了。因为，底层技术上面介绍的七七八八了。关于Docker网络，官方的[这篇文章](https://success.docker.com/article/networking#vxlandataplane)介绍的非常详细，从概念到技术细节等。我写的没人家深入，表达也没人家好，建议直接阅读这篇文章。我也是根据这篇文章中的介绍入手学习的。
+
+## 最后
+
+这篇文章是目前花时间最多的一篇文章，自己对网络的底层技术不是很熟悉，尤其是`netns`和`vxlan`等。刚开始只是好奇底层技术，然后慢慢学习实践，到现在写完，有一种如释重负的感觉，算是给自己一个交待了。
+
+希望自己以后在学习一个技术知识时，能够更加深入，自己前几年工作经历中往往停留于熟练使用。对待技术，要像个小孩子，多问自己几个为什么。
