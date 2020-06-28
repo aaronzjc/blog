@@ -20,7 +20,7 @@ categories: golang web
 
 `MU`是一个非常简单的热榜聚合网站。会定时去获取自己经常访问的几个站点的指定内容，然后存储至Redis中，供集中展示。整个项目的架构如图
 
-![图片]({{ site.url }}/assert/imgs/goweb_0.png)
+![图片](/assert/imgs/goweb_0.png)
 
 应用分为两部分。一个是命令行部分，定时获取内容；一个是http服务，提供前端展示。因此，最终会部署两个应用。
 
@@ -111,7 +111,7 @@ CI/CD一共分4个步骤。构建，执行make生成两个可执行文件。注�
 
 关于Drone怎么使用，可以参考之前的文章，也可以上官方阅读文档了解。实际构建效果图
 
-![图片]({{ site.url }}/assert/imgs/goweb_1.png)
+![图片](/assert/imgs/goweb_1.png)
 
 ### 部署
 
@@ -177,7 +177,7 @@ configs:
 
 如果整个过程没问题的话，服务就可以访问了。然后，后面更新代码，会走CI去自动拉镜像更新服务。这样，就完成整个自动化部署过程了。来一个运行状态效果图
 
-![图片]({{ site.url }}/assert/imgs/goweb_2.png)
+![图片](/assert/imgs/goweb_2.png)
 
 体验非常好。
 

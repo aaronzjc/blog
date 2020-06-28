@@ -489,7 +489,7 @@ func main() {
 
 整个请求过程如图
 
-![图片]({{ site.url }}/assert/imgs/gin_1.png)
+![图片](/assert/imgs/gin_1.png)
 
 ### 闲言碎语
 
