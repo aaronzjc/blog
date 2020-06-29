@@ -11,13 +11,13 @@ categories: linux
 
 这里面的技术知识有很多，我对其中的网络部分很感兴趣。主要好奇，容器如何通信，以及多机器之间的容器通信。于是，学习了下容器的网络知识。
 
-本文主要介绍Docker网络中涉及到的知识。主要包括`netns`，`iptables`，`vlan`，`vxlan`。
+本文主要介绍Docker网络中涉及到的知识，包括`netns`，`iptables`，`vlan`，`vxlan`。
 
 ## 网络知识
 
 ### Network Namespace
 
-`Network Namespace`是网络虚拟化的一个重要功能。它可以创建多个隔离的网络空间，每个网络空间有自己独立的网络栈。
+`Network Namespace`是虚拟化的一个重要功能。它可以创建多个隔离的网络空间，每个网络空间有自己独立的网络栈。
 
 linux提供`ip`命令来管理各种网络设备，资源等，非常方便。
 
@@ -39,7 +39,7 @@ ns2
 ns1
 ```
 
-查看两个命名空间的网卡情况
+查看两个命名空间的网络地址情况
 
 ```shell
 $ ip netns exec ns1 ip addr
@@ -64,14 +64,16 @@ $ ip link set dev myveth2 netns ns2
 
 # 3. 分配IP。因为两个设备已经分配到指定命名空间，所以，是不能直接ip add的。需要在指定的ns下。
 $ ip netns exec ns1 ip addr add 192.168.1.1/24 dev myveth1
+$ ip netns exec ns1 ip link set myveth1 up
 $ ip netns exec ns2 ip addr add 192.168.1.2/24 dev myveth2
+$ ip netns exec ns2 ip link set myveth2 up
 
 # 4. 测试连接
 $ ip netns exec ns1 ping 192.168.1.2
 $ ip netns exec ns2 ping 192.168.1.1
 ```
 
-如上，就熟悉了基本的`netns`概念和操作。现实生活中，在一个局域网中的N台机器，他们之间可以通过交换机通信。如果是在N个网络命名空间中呢，怎么让它们之前互通？可以使用`bridge`，也就是网桥，类似于现实中的交换机。
+如上，就熟悉了基本的`netns`概念和操作。现实生活中，一个局域网中的N台机器，他们之间可以通过交换机通信。如果是在N个网络命名空间中呢，怎么让它们之前互通？可以使用`bridge`，也就是网桥，类似于现实中的交换机。
 
 接着实践下怎么利用`bridge`和`veth pair`实现不同`netns`互通。我们测试的网络结构如图
 
@@ -163,19 +165,23 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 现在再PING就没问题了。
 
-如上，介绍了linux下使用`ip`命令管理`Network Namespace`的相关知识。并学会了搭建一个简单的网桥。实际上这个网桥结构就是Docker默认的网络方式。
+如上，介绍了linux下使用`ip`命令管理`Network Namespace`的相关知识。并学会了搭建一个简单的网桥。实际上这个网桥结构就是Docker默认的`bridge`网络方式。实践中，还提到了修改`iptables`的相关规则。`iptables`也是linux网络中一个重要的内容。它主要是管理数据包转发，过滤和NAT等。Docker中的网络实现也依赖它。
 
-在上面的实践中，提到了修改`iptables`的相关规则。`iptables`也是linux网络中一个重要的内容。它主要是管理数据包转发，过滤和NAT等。Docker中的网络实现也依赖于它。
+目前为止，我们了解了`veth pair`和`bridge`虚拟设备。linux下还有其他的虚拟网络设备。这些设备都是虚拟化技术中，在软件层面实现现实中的网络模型而抽象出来的东西。
+
+参考资料
+
++ [虚拟网络中的linux虚拟设备](https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking/)   
 
 ### iptables
 
 #### 基本介绍
 
-`netfilter`是linux内核提供的防火墙功能，它可以对网络数据包过滤和修改。`netfilter`提供了5个钩子来让其他程序针对数据包特定阶段进行处理，分别是`PREROUTING`，`INPUT`，`FORWARD`，`OUTPUT`，`POSTROUTING`。`iptables`是运行在用户空间的应用软件，通过对`netfilter`的几个阶段配置来实现管理网络包等。
+`netfilter`是linux内核提供的防火墙功能，它可以对网络数据包过滤和修改。`netfilter`提供了5个钩子来让其他程序针对数据包特定阶段进行处理，分别是`PREROUTING`，`INPUT`，`FORWARD`，`OUTPUT`，`POSTROUTING`。`iptables`是运行在用户空间的应用软件，通过对`netfilter`的几个阶段配置来实现网络包管理。
 
 `iptables`定义了一套自己的规则系统，主要包含`table`，`chain`，`rule`，`target`这几个概念。
 
-其中，`table`指不同的数据处理流程，例如，用于数据过滤的`filter`表，用于`NAT`功能的`nat`表，以及用于修改数据包的`mangle`表等。每张`table`又包含多个`chain`，`chain`是一系列`rule`的合集，从上往下依次匹配。当匹配到指定的`rule`，执行对应的`target`。通常，每个`chain`有一个默认`policy`。当`chain`中所有`rule`执行完毕没有跳走，则执行默认的`policy`。
+其中，`table`指不同的数据处理流程，例如，用于数据过滤的`filter`表，用于`NAT`功能的`nat`表，以及用于修改数据包的`mangle`表等。每张`table`又包含多个`chain`。`chain`是一系列`rule`的合集，从上往下依次匹配。当匹配到指定的`rule`，则执行对应的`target`。通常，每个`chain`还有一个默认`policy`。当`chain`中所有`rule`执行完毕后没有跳走，则执行默认的`policy`。
 
 `iptables`包含如下4个表，表中包含了几个默认链
 
@@ -195,7 +201,9 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 >   + OUTPUT
 >
 
-每个表虽然包含的链名字相同，但是彼此没有关联。唯一的相同点，就是之前提到的`netfilter`中的特定阶段。数据包在`netfilter`中的流转如图
+除此之外，用户也可以自定义链。每个表虽然包含的链名字相同，但是彼此没有关联。唯一的相同点，就是之前提到的`netfilter`中的特定阶段。
+
+数据包在`netfilter`中的流转如图
 
 ![图片](/assert/imgs/iptables_flow.png)
 
@@ -206,9 +214,9 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 1、外部进来
 
-首先，看左上角的注释，分为`Network Level`和`Bridge Level`。前面简单提过`bridge`的概念，用于在linux主机模拟二层交换机。linux为了实现网络虚拟化，实现了一系列模拟硬件设备，例如，`bridge`，`veth`等。
+首先，看左上角的注释，分为`Network Level`和`Bridge Level`。前面简单提过`bridge`的概念，用于在linux主机模拟二层交换机。
 
-如果没有`bridge`的话，网络包的处理比较单一，从网卡进来后，进入网络层。引入`bridge`后，就需要在二层判断是否是发送给`bridge`的，然后，经由`bridge`转发。
+如果没有`bridge`的话，网络包的处理比较单一，从网卡进来后，进入网络层。引入`bridge`后，就需要在二层判断数据包是否发送给`bridge`，是否需要经由`bridge`转发。
 
 从左往右梳理，当一个数据包从物理网卡进入，经过检查，发现它属于网桥接口。则数据包不会走`T`往上进入网络层，而是继续在网桥处理。从图可以看到，依次经过`iptables`中的`nat-prerouting`，`raw-prerouting`。之后，进入一个特殊的流程`conntrack`。
 
@@ -229,13 +237,13 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 3、SNAT和DNAT
 
-在`POSTROUTING`中，有一个有意思的地方，就是`SNAT`。当容器内访问外网时，需要经过一次源IP转换。因为，接收方根据源IP回复时，没办法路由到内网IP。所以需要将源IP转换成出口IP。这里，又有一个情况，如果出口IP不是固定的呢，这样转换就有些棘手了。在`SNAT`中，有一个特殊动作叫`MASQUERADE`，就是动态设置源IP为出口IP。
+在`POSTROUTING`中，有一个有意思的地方，就是`SNAT`。当容器内访问外网时，需要经过一次源IP转换。因为，接收方根据源IP回复时，没办法路由到内网IP。所以需要将源IP转换成出口IP。这里，又有一个情况，如果出口IP不是固定的呢，这样转换就有些棘手了。在`SNAT`中，有一个特殊动作叫`MASQUERADE`，就是动态设置源IP为出口IP。在上面那一节内容，提到过这个配置。
 
 有对源IP转换，就有对目的IP进行转换。在Docker映射端口时，外网访问宿主机的IP和映射的端口。当数据包到达宿主机后，宿主机则会将目的IP还原，改写成容器的IP。这就是`DNAT`的作用。
 
 #### Docker中的iptables
 
-Docker中的网络就利用到了`iptables`。我们分析下Docker默认网络驱动`bridge`模式下的`iptables`规则。
+Docker网络实现就使用到了`iptables`。我们分析下Docker默认网络驱动`bridge`模式下的`iptables`规则。
 
 首先，准备如下的容器
 
@@ -259,7 +267,7 @@ $ docker inspect C1
 "IPAddress": "172.17.0.2"
 ```
 
-查看此时系统路由和`iptables`规则，系统路由用于处理Docker数据包的转发，`iptables`用于地址转换，过滤等。
+查看此时系统路由和`iptables`规则。系统路由用于处理Docker数据包的转发，`iptables`用于地址转换，过滤等。
 
 ```shell
 $ ip route
@@ -364,7 +372,7 @@ nat:POSTROUTING:policy:3    IN= OUT=docker0 SRC=172.17.0.1 DST=172.17.0.2
 
 ![图片](/assert/imgs/docker_net_basic4.png)
 
-当主机`a`想要和`c`通信时，会发送数据包给交换机`B`。`B`如果没有记录`c`的地址，则会发送arp请求给所有的端口查询`c`的mac地址，包括`A`。`A`同样会转发到`B`去查询。如果一个局域网下的机器非常多的化，这样就会造成泛洪，导致网络充斥着这些数据包。所以提出了`vlan`，进一步划分子网。`vlan`的作用
+当主机`a`想要和`c`通信时，会发送数据包给交换机`B`。`B`如果没有记录`c`的地址，则会发送arp请求给所有的端口查询`c`的mac地址，包括`A`。`A`同样会转发到`B`去查询。如果一个局域网下的机器非常多，这样就会造成网络泛洪。导致网络充斥着这些数据包，阻塞其他正常的通信。所以提出了`vlan`，进一步划分子网。`vlan`的作用
 
 + 广播控制
 + 带宽利用
@@ -396,17 +404,15 @@ nat:POSTROUTING:policy:3    IN= OUT=docker0 SRC=172.17.0.1 DST=172.17.0.2
 + 需要支持虚拟机的灵活迁移。可能一个物理机宕机了，在之上的虚拟机会很快迁移到另一个机器，这两个机器很可能不在一个子网内，但是迁移时又不希望改变它的网络配置。而通常`vlan`下的机器都属于一个子网，这样就限制了虚拟机的迁移。
 + `STP`收敛慢的问题。其实，我自己的理解，`vxlan`并没有主要去解决这个问题。而是它选择基于三层网络传输，自然就没有这个问题了。
 
-`vxlan`怎么工作？
-
-`vxlan`使用`mac in udp`方式，将二层的数据封装成UDP数据包，通过`4789`端口，在三层网络中传输。这种`mac in udp`方式也并不是首创，很多隧道通信协议都采用这种方式。它具体的封装结构如图(来自：[这里](https://support.huawei.com/enterprise/en/doc/EDOC1100004365/f95c6e68/vxlan-packet-format))
+`vxlan`怎么工作的呢？`vxlan`使用`mac in udp`方式，将二层的数据封装成UDP数据包，通过`4789`端口，在三层网络中传输。具体的封装结构如图(来自：[这里](https://support.huawei.com/enterprise/en/doc/EDOC1100004365/f95c6e68/vxlan-packet-format))
 
 ![img](/assert/imgs/docker_net_basic5.png)
 
-类似`vlan`，`vxlan`通过24位的`vni`来标识子网，解决了空间不足的问题。相同`vni`构成的一个虚拟大二层网络叫`Bridge-Domain`，简称`BD`。`vxlan`需要`vtep`设备做封包和解包。`vtep`设备可以是物理交换机，也可以是虚拟的网络设备。
+这种`mac in udp`方式也并不是首创，很多隧道通信协议都采用这种方式。类似`vlan`，`vxlan`通过24位的`vni`来标识子网，解决了空间不足的问题。相同`vni`构成的一个虚拟大二层网络叫`Bridge-Domain`，简称`BD`。`vxlan`需要`vtep`设备做封包和解包。`vtep`设备可以是物理交换机，也可以是虚拟的网络设备。
 
-因为`vxlan`是利用三层网络来实现逻辑二层网络。那么`vxlan`也具备`vlan`的一些特征。例如，支持单播，多播和广播等；不同的`vni`之间不能直接通信，需要借助其他的方式来实现。
+因为`vxlan`是利用三层网络来实现逻辑二层网络。那么`vxlan`也具备二层网络的一些特征。例如，支持单播，多播和广播等。不同的`vni`网络之间不能直接通信，需要借助其他的方式来实现。
 
-了解了`vxlan`的基本概念，接下来实际操作。实现一个`vxlan`，让两个虚拟机中的Docker容器能够通过`vxlan`通信。大致结构如图
+了解了`vxlan`的基本概念，接下来实际操作，实现一个`vxlan`，让两个虚拟机中的Docker容器能够通过`vxlan`通信。大致结构如图
 
 ![img](/assert/imgs/docker_net_basic7.png)
 
@@ -430,7 +436,7 @@ $ docker run -itd --name vx --net mybridge --ip 192.168.110.3 busybox
 $ docker exec vx ping 192.168.110.3
 ```
 
-接着，我们在两个虚拟机上，搭建一个`vxlan`。然后，让Docker的网络请求走`vxlan`
+因为两个容器都没有对外暴露端口，主机的数据包是路由不到容器的。尽管两个容器的网络地址很像，但是实际上是处于不同的网络栈，也没办法连通。接着，我们通过`vxlan`让两个容器通信。首先，新建一个`vxlan`，然后让`mybridge`使用此`vxlan`。
 
 ```shell
 # 虚拟机C1
@@ -448,9 +454,10 @@ $ docker exec vx ping 192.168.110.3
 bingo !
 ```
 
+通过`vxlan`，我们就打通了两个容器。其逻辑上，就像橙色线条那样连接着。但是实际通信过程，就像图中绿色的线条那样。
+
 部分参考资料
 
-+ [虚拟网络中的linux虚拟设备](https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking/)   
 + [什么是vxlan](https://support.huawei.com/enterprise/zh/doc/EDOC1100087027#ZH-CN_TOPIC_0254803605)
 + [Practice VxLAN under linux](https://programmer.help/blogs/practice-vxlan-under-linux.html)
 
@@ -482,10 +489,10 @@ Docker网络代码在[这里](https://github.com/moby/libnetwork)。它默认提
 
     新的网络虚拟化技术。这个还没深入了解。
 
-关于Docker网络驱动部分，这里都是一句话带过了。因为，底层技术上面介绍的七七八八了。关于Docker网络，官方的[这篇文章](https://success.docker.com/article/networking#vxlandataplane)介绍的非常详细，从概念到技术细节等。我写的没人家深入，表达也没人家好，建议直接阅读这篇文章。我也是根据这篇文章中的介绍入手学习的。
+关于Docker网络驱动部分，这里都是一句话带过了。因为，底层技术上面介绍的七七八八了。关于Docker网络，官方的[这篇文章](https://success.docker.com/article/networking#vxlandataplane)介绍的非常细致，从概念到架构到技术细节等。我写的没人家深入，表达也没人家好，建议直接阅读这篇文章。我也是根据这篇文章中的介绍入手学习的。
 
 ## 最后
 
 这篇文章是目前花时间最多的一篇文章，自己对网络的底层技术不是很熟悉，尤其是`netns`和`vxlan`等。刚开始只是好奇底层技术，然后慢慢学习实践，到现在写完，有一种如释重负的感觉，算是给自己一个交待了。
 
-希望自己以后在学习一个技术知识时，能够更加深入，自己前几年工作经历中往往停留于熟练使用。对待技术，要像个小孩子，多问自己几个为什么。
+希望自己以后在学习一个技术知识时，能够更加深入，自己前几年工作经历中往往停留于熟练使用。对待技术，多问自己几个为什么。
