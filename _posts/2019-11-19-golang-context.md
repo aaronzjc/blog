@@ -68,29 +68,29 @@ func main() {
 package main
 
 import (
-	"context"
-	"fmt"
-	"time"
+    "context"
+    "fmt"
+    "time"
 )
 
 func main() {
-	// 给main协程设置一个1s超时context
-	ctx, _ := context.WithTimeout(context.Background(), time.Second)
-	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+    // 给main协程设置一个1s超时context
+    ctx, _ := context.WithTimeout(context.Background(), time.Second)
+    fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 
-	ch := make(chan struct{})
-	go func() {
-		time.Sleep(time.Second * 2)
-		ch <- struct{}{}
-	}()
-	select {
-	case <- ctx.Done():
-		fmt.Println("cancel -1 at " + time.Now().Format("2006-01-02 15:04:05"))
-	case <- ch:
-		fmt.Println("Done sleep 2s")
-	}
+    ch := make(chan struct{})
+    go func() {
+        time.Sleep(time.Second * 2)
+        ch <- struct{}{}
+    }()
+    select {
+    case <- ctx.Done():
+        fmt.Println("cancel -1 at " + time.Now().Format("2006-01-02 15:04:05"))
+    case <- ch:
+        fmt.Println("Done sleep 2s")
+    }
 
-	fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
+    fmt.Println(time.Now().Format("2006-01-02 15:04:05"))
 }
 ```
 
@@ -167,92 +167,92 @@ func main() {
 package main
 
 import (
-	"context"
-	"fmt"
-	"sync"
-	"time"
+    "context"
+    "fmt"
+    "sync"
+    "time"
 )
 
 func LogT(msg string) {
-	fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " : " + msg)
+    fmt.Println(time.Now().Format("2006-01-02 15:04:05") + " : " + msg)
 }
 
 func ToughJob(s time.Duration, ch chan int, name string) {
-	time.Sleep(time.Second * s)
-	LogT("job " + name + " Done")
-	ch <- 1
+    time.Sleep(time.Second * s)
+    LogT("job " + name + " Done")
+    ch <- 1
 }
 
 func A(ctx context.Context) {
-	defer wg.Done()
-	aCtx, _ := context.WithCancel(ctx)
-	fmt.Println("this is A")
-	ch := make(chan int)
-	go ToughJob(2, ch, "A")
+    defer wg.Done()
+    aCtx, _ := context.WithCancel(ctx)
+    fmt.Println("this is A")
+    ch := make(chan int)
+    go ToughJob(2, ch, "A")
 
-	select {
-	case <- ch:
-		LogT("A Done")
-	case <- aCtx.Done():
-		LogT("A Cancel")
-	}
+    select {
+    case <- ch:
+        LogT("A Done")
+    case <- aCtx.Done():
+        LogT("A Cancel")
+    }
 }
 
 func B(ctx context.Context) {
-	bCtx, cancel := context.WithCancel(ctx)
+    bCtx, cancel := context.WithCancel(ctx)
 
-	fmt.Println("this is B")
-	ch := make(chan int)
-	go ToughJob(2, ch, "B")
+    fmt.Println("this is B")
+    ch := make(chan int)
+    go ToughJob(2, ch, "B")
 
-	go func() {
-		// time.Sleep(time.Second)
-		cancel()
-	}()
+    go func() {
+        // time.Sleep(time.Second)
+        cancel()
+    }()
 
-	select {
-	case <- ch:
-		LogT("B Done")
-		// do B1, B2
-		wg.Add(2)
-		go Bb(bCtx, "B1")
-		go Bb(bCtx, "B2")
-	case <- ctx.Done():
-		LogT("B Cancel")
-		cancel()
-	}
-	wg.Done()
+    select {
+    case <- ch:
+        LogT("B Done")
+        // do B1, B2
+        wg.Add(2)
+        go Bb(bCtx, "B1")
+        go Bb(bCtx, "B2")
+    case <- ctx.Done():
+        LogT("B Cancel")
+        cancel()
+    }
+    wg.Done()
 }
 
 func Bb(ctx context.Context, name string) {
-	defer wg.Done()
-	fmt.Println("this is " + name)
+    defer wg.Done()
+    fmt.Println("this is " + name)
 
-	select {
-	case <- time.After(time.Second * 2):
-		LogT("job " + name + " Done")
-	case <- ctx.Done():
-		LogT(name + " Cancel")
-	}
+    select {
+    case <- time.After(time.Second * 2):
+        LogT("job " + name + " Done")
+    case <- ctx.Done():
+        LogT(name + " Cancel")
+    }
 }
 
 var wg = sync.WaitGroup{}
 
 func main() {
-	LogT("start")
+    LogT("start")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	wg.Add(2)
-	go A(ctx)
-	go B(ctx)
+    ctx, cancel := context.WithCancel(context.Background())
+    wg.Add(2)
+    go A(ctx)
+    go B(ctx)
 
-	//go func() {
-	//	time.Sleep(time.Second*3)
-	//	cancel()
-	//}()
+    //go func() {
+    //    time.Sleep(time.Second*3)
+    //    cancel()
+    //}()
 
-	LogT("end")
-	wg.Wait()
+    LogT("end")
+    wg.Wait()
 }
 ```
 

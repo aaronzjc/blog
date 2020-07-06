@@ -4,6 +4,6 @@ source "https://rubygems.org"
 
 git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 
-# gem "rails"
+# lock github pages jekyll version
 gem 'github-pages', '~> 206'
 gem 'jekyll', '~> 3.8.7'
