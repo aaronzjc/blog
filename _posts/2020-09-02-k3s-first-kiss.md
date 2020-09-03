@@ -41,7 +41,7 @@ categories: linux
 
 首先，`Mu`有3个组件，接口`api`组件，调度器`commander`组件，执行器`agent`组件。需要3个部署文件。
 
-1、 首先，创建一个明明空间
+1、 首先，创建一个命名空间
 
 ```yaml
 apiVersion: v1
