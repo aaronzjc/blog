@@ -50,6 +50,6 @@ EOF
 $ openssl x509 -req -in $DOMAIN_NAME.csr -CA $CA_NAME.pem -CAkey $CA_NAME.key -CAcreateserial -out $DOMAIN_NAME.crt -days 825 -sha256 -extfile $DOMAIN_NAME.ext
 ```
 
-最后，添加`$CA_NAME.pem`到系统的信任。服务器配置`$DOMAIN_NAME.key`和`$DOMAIN_csr`即可。
+最后，添加`$CA_NAME.pem`到系统的信任。服务器配置`$DOMAIN_NAME.key`和`$DOMAIN_NAME.crt`即可。
 
 值得注意的是，在`osx`系统中，`Chrome`只需要在钥匙链中信任CA证书即可。`Firefox`需要手动导入到它的证书配置中。
