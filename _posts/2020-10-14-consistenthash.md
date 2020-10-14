@@ -40,47 +40,47 @@ categories: deep-in
 package consistenthash
 
 import (
-	"hash/crc32"
-	"sort"
-	"strconv"
+    "hash/crc32"
+    "sort"
+    "strconv"
 )
 
 type Hash func(data []byte) uint32
 
 type Map struct {
-	hash     Hash
-	replicas int
-	keys     []int // 所有节点的hash值
-	hashMap  map[int]string
+    hash     Hash
+    replicas int
+    keys     []int // 所有节点的hash值
+    hashMap  map[int]string
 }
 
 func New(replicas int, fn Hash) *Map {
-	m := &Map{
-		replicas: replicas, // 生成多少个节点副本
-		hash:     fn, // 底层使用的hash算法
-		hashMap:  make(map[int]string),
+    m := &Map{
+        replicas: replicas, // 生成多少个节点副本
+        hash:     fn, // 底层使用的hash算法
+        hashMap:  make(map[int]string),
     }
     // 默认的hash算法
 	if m.hash == nil {
-		m.hash = crc32.ChecksumIEEE
+        m.hash = crc32.ChecksumIEEE
 	}
 	return m
 }
 
 // 判断是否为空
 func (m *Map) IsEmpty() bool {
-	return len(m.keys) == 0
+    return len(m.keys) == 0
 }
 
 // 生成各个节点的hash，也就是生成一个“环”。
 func (m *Map) Add(keys ...string) {
-	for _, key := range keys {
+    for _, key := range keys {
         // 根据副本数量，添加节点，即节点+虚拟节点
-		for i := 0; i < m.replicas; i++ {
-			hash := int(m.hash([]byte(strconv.Itoa(i) + key)))
-			m.keys = append(m.keys, hash)
-			m.hashMap[hash] = key
-		}
+        for i := 0; i < m.replicas; i++ {
+            hash := int(m.hash([]byte(strconv.Itoa(i) + key)))
+            m.keys = append(m.keys, hash)
+            m.hashMap[hash] = key
+        }
     }
     // 排序，加速查找
 	sort.Ints(m.keys)
@@ -88,21 +88,17 @@ func (m *Map) Add(keys ...string) {
 
 // 获取随机字符串对应的节点
 func (m *Map) Get(key string) string {
-	if m.IsEmpty() {
-		return ""
-	}
-
-	hash := int(m.hash([]byte(key)))
-
-	// 查找所有hash节点中，大于给定元素hash的第一个节点
-	idx := sort.Search(len(m.keys), func(i int) bool { return m.keys[i] >= hash })
-
-	// 没找到，表明到了环的最后一节，取第一个节点。
-	if idx == len(m.keys) {
-		idx = 0
-	}
-
-	return m.hashMap[m.keys[idx]]
+    if m.IsEmpty() {
+        return ""
+    }
+    hash := int(m.hash([]byte(key)))
+    // 查找所有hash节点中，大于给定元素hash的第一个节点
+    idx := sort.Search(len(m.keys), func(i int) bool { return m.keys[i] >= hash })
+    // 没找到，表明到了环的最后一节，取第一个节点。
+    if idx == len(m.keys) {
+        idx = 0
+    }
+    return m.hashMap[m.keys[idx]]
 }
 ```
 
