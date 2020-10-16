@@ -2,7 +2,7 @@
 layout: post
 title: "Jekyll博客加上Mp3播放器"
 date:   2016-09-25 10:00:00 +0800
-categories: jekyll
+categories: skills
 ---
 
 {::nomarkdown}
