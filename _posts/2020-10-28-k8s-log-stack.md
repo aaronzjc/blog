@@ -154,3 +154,5 @@ spec:
 ![img](/assert/imgs/logstack_4.png)
 
 如上。我们就在k8s中，实践了日志的收集，展示，监控这些基本操作。
+
+文章中的所有部署文件(除了敏感的配置)，都可以在[这个仓库](https://github.com/aaronzjc/k3s)找到~
