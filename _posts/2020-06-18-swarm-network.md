@@ -177,24 +177,25 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 #### 基本介绍
 
-`netfilter`是linux内核提供的防火墙功能，它可以对网络数据包过滤和修改。`netfilter`提供了5个钩子来让其他程序针对数据包特定阶段进行处理，分别是`PREROUTING`，`INPUT`，`FORWARD`，`OUTPUT`，`POSTROUTING`。`iptables`是运行在用户空间的应用软件，通过对`netfilter`的几个阶段配置来实现网络包管理。
+`netfilter`是linux内核提供的防火墙功能，它可以对网络数据包过滤和修改。`netfilter`提供了5个钩子来让其他程序针对数据包特定阶段进行处理，分别是`PREROUTING`，`INPUT`，`FORWARD`，`OUTPUT`，`POSTROUTING`。`iptables`是运行在用户空间的应用软件，可以配置这几个阶段的具体规则。
 
 `iptables`定义了一套自己的规则系统，主要包含`table`，`chain`，`rule`，`target`这几个概念。
 
-其中，`table`指不同的数据处理流程，例如，用于数据过滤的`filter`表，用于`NAT`功能的`nat`表，以及用于修改数据包的`mangle`表等。每张`table`又包含多个`chain`。`chain`是一系列`rule`的合集，从上往下依次匹配。当匹配到指定的`rule`，则执行对应的`target`。通常，每个`chain`还有一个默认`policy`。当`chain`中所有`rule`执行完毕后没有跳走，则执行默认的`policy`。
+其中，`table`指不同的规则链的集合，例如，用于数据过滤的`filter`表，用于`NAT`功能的`nat`表，以及用于修改数据包的`mangle`表等。每张`table`又包含多个`chain`。`chain`是一系列相似`rule`的合集，从上往下依次匹配。当匹配到指定的`rule`，则执行对应的`target`。通常，每个`chain`还有一个默认`policy`。当`chain`中所有`rule`执行完毕后没有跳走，则执行默认的`policy`。
 
-`iptables`包含如下4个表，表中包含了几个默认链
+`iptables`包含如下4个表，表中包含了几个默认链。基本上所有的匹配都是从这些默认链开始的。用户可以定义自己的链，然后从默认链跳到用户自定义的链处理。
 
 >
-> + filter表：默认表，用于包过滤
+> + filter表：默认表，用于包过滤。既然是包过滤，那么它肯定可以再输入和输出和路由后进行过滤。
 >   + INPUT链：输入链，发往本机数据包通过此链
 >   + OUTPUT链：输出链，从本机输出时调用
 >   + FORWARD链：转发链，上面介绍过。本机转发的数据包通过此链
-> + nat表：用户`NAT`，网络地址转换
+> + nat表：用户`NAT`，网络地址转换。
+>   + INPUT: 输入链
 >   + PREROUTING：路由前链，处理路由规则前调用。通常用于`DNAT`目的地址转换
 >   + POSTROUTING：路由后链，完成路由后调用。通常用于`SNAT`源地址转换
 >   + OUTPUT：输出链，类似于PREROUTING，但是处理本机发出的数据
-> + mangle表：用于处理数据包，侧重于单个数据包
+> + mangle表：用于数据包修改，侧重于单个数据包。可以在每个阶段进行处理。
 >   + ALL：基本包含了上述所有的流程
 > + raw表：处理异常
 >   + PREROUTING
@@ -363,6 +364,7 @@ nat:POSTROUTING:policy:3    IN= OUT=docker0 SRC=172.17.0.1 DST=172.17.0.2
 + [netfilter介绍(推荐)](https://opengers.github.io/openstack/openstack-base-virtual-network-devices-bridge-and-vlan/#bridge%E4%B8%8Enetfilter)
 + [Docker网络iptables追踪(推荐)](https://tonybai.com/2017/11/06/explain-docker-single-host-network-using-iptables-trace-and-ebtables-log/)
 + [iptables interaction on linux bridge](http://ebtables.netfilter.org/br_fw_ia/br_fw_ia.html)
++ [IPTable美化](https://tools.memosa.cn)
 
 ### vlan和vxlan
 
