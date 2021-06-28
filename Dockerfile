@@ -1,6 +1,6 @@
 FROM jekyll/builder:3.8 as build
-RUN mkdir /dist
-ADD . /dist
+RUN mkdir -p /dist/_site
+COPY . /dist
 WORKDIR /dist
 RUN jekyll build 
 
