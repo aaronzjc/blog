@@ -1,5 +1,5 @@
 FROM jekyll/builder:3.8 as build
-RUN mkdir . /dist
+RUN mkdir /dist
 ADD . /dist
 WORKDIR /dist
 RUN jekyll build 
