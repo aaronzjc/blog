@@ -14,8 +14,13 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Build
-      uses: jerryjvl/jekyll-build-action@v1
+    - uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+    - uses:  lemonarc/jekyll-action@1.0.0
     - name: set docker buildx
       uses: docker/setup-buildx-action@v1
     - name: docker login
