@@ -1,4 +1,4 @@
-FROM jekyll/builder:3.8 as build
+FROM jekyll/builder:4 as build
 RUN mkdir -p /dist/_site
 COPY . /dist
 WORKDIR /dist

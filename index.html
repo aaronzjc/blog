@@ -1,10 +1,12 @@
 ---
 layout: default
+pagination: 
+  enabled: true
 ---
 
 <div class="home">
 
-    <h1 class="page-heading">归档: {{site.posts.size}}篇</h1>
+    <h1 class="page-heading">归档: {{ site.posts.size }}篇</h1>
 
     <ul class="post-list">
         {% for post in paginator.posts %}
@@ -33,7 +35,5 @@ layout: default
         {% endif %}
     </div>
     {% endif %}
-
-    <!-- <p class="rss-subscribe">订阅 <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p> -->
 
 </div>

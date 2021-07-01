@@ -1,17 +1,26 @@
 title: 张进程
 email: 415397228@qq.com
-description: 张进程个人技术，生活。PHP，Go，Web... # 个人博客
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://blog.memosa.cn"  #the base hostname & protocol for your site
+description: 张进程个人技术，生活。PHP，Go，Web... 
+baseurl: ""
+url: "https://blog.memosa.cn"
 twitter_username: 不害羞滴含羞草
 github_username:  aaronzjc
 
-# gem files
-plugins: [jekyll-paginate]
+plugins:
+  - jekyll-paginate-v2
+exclude:
+  - Gemfile
+  - Gemfile.lock  
+pagination:
+  enabled: true
+  debug: false
+  collection: 'posts'
 
-# Build settings
-markdown: kramdown
-
-# pagination
-paginate: 7
-paginate_path: "/blog/page/:num"
+  # How many objects per paginated page, used to be `paginate` (default: 0, means all)
+  per_page: 7
+  permalink: '/page/:num/'
+  sort_field: 'date'
+  sort_reverse: true
+  category: 'posts'
+  extension: html
+  indexpage: 'index'
