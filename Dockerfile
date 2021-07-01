@@ -1,8 +1,9 @@
-FROM jekyll/builder:4 as build
+FROM jekyll/jekyll:4.2.0 as build
 RUN mkdir -p /dist/_site
 COPY . /dist
 WORKDIR /dist
-RUN bundle exec jekyll build 
+RUN chown -R jekyll:jekyll /dist
+RUN jekyll build 
 
 FROM nginx as dist 
 COPY --from=build /dist/_site /usr/share/nginx/html
