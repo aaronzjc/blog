@@ -105,7 +105,7 @@ echo 'Four Ctrl+z : ' . $origin->getState() . "\n";
 所以整个就是这么一个需求。用备忘录确实很合适。首先，复用一个图表对象，可以看做原始对象。然后，图表展示不同的内容，可以看做不同的状态。这样，就只需要考虑什么时候，保存状态，什么时候回退状态即可。下面是实际的效果(使用Chrome播放)。
 
 <div class="video">
-<video src="/assert/medias/echarts2.0.mov" controls="controls">
+<video src="/static/assert/medias/echarts2.0.mov" controls="controls">
 your browser does not support the video tag
 </video>
 </div>

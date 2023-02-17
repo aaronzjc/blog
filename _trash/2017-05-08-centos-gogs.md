@@ -58,11 +58,11 @@ $ ./gogs web -p 9090
 
 如上的命令，就下载启动一个gogs服务，打开浏览器输入`x.x.x.x:9090`, 就可以访问gogs的配置页面了。
 
-![图片]({{ site.url }}/assert/imgs/gogs_1.png)
+![图片]({{ site.url }}/static/assert/imgs/gogs_1.png)
 
 配置好之后，注册用户，即可开始使用Gogs了。界面和Github有几分神似。项目管理等，也是类似，很熟悉。
 
-![图片]({{ site.url }}/assert/imgs/gogs_2.png)
+![图片]({{ site.url }}/static/assert/imgs/gogs_2.png)
 
 注意，阿里云，Cent OS 7.0系统对于端口控制的很严格，好像必须手动开启端口，才能运行。这里，手动开启防火墙端口命令。如果启动之后访问，发现访问拒绝，可以试试如下命令。
 

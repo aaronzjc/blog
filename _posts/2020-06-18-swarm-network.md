@@ -77,7 +77,7 @@ $ ip netns exec ns2 ping 192.168.1.1
 
 接着实践下怎么利用`bridge`和`veth pair`实现不同`netns`互通。我们测试的网络结构如图
 
-![图片](/assert/imgs/docker_net_basic1.png)
+![图片](/static/assert/imgs/docker_net_basic1.png)
 
 结构很简单，但是命令一大坨。开始动手
 
@@ -206,7 +206,7 @@ $ iptables -t nat -A POSTROUTING -s 192.168.2.1/24 -j MASQUERADE
 
 数据包在`netfilter`中的流转如图
 
-![图片](/assert/imgs/iptables_flow.png)
+![图片](/static/assert/imgs/iptables_flow.png)
 
 
 #### 流程图说明
@@ -372,7 +372,7 @@ nat:POSTROUTING:policy:3    IN= OUT=docker0 SRC=172.17.0.1 DST=172.17.0.2
 
 我们知道，`LAN`是由几台机器组成的网络。例如，在一个公司，多个部门之间的机器通过交换机就组成了一个`LAN`。但是，二层交换机只构成单一广播域。对于如下的拓扑结构
 
-![图片](/assert/imgs/docker_net_basic4.png)
+![图片](/static/assert/imgs/docker_net_basic4.png)
 
 当主机`a`想要和`c`通信时，会发送数据包给交换机`B`。`B`如果没有记录`c`的地址，则会发送arp请求给所有的端口查询`c`的mac地址，包括`A`。`A`同样会转发到`B`去查询。如果一个局域网下的机器非常多，这样就会造成网络泛洪。导致网络充斥着这些数据包，阻塞其他正常的通信。所以提出了`vlan`，进一步划分子网。`vlan`的作用
 
@@ -408,7 +408,7 @@ nat:POSTROUTING:policy:3    IN= OUT=docker0 SRC=172.17.0.1 DST=172.17.0.2
 
 `vxlan`怎么工作的呢？`vxlan`使用`mac in udp`方式，将二层的数据封装成UDP数据包，通过`4789`端口，在三层网络中传输。具体的封装结构如图(来自：[这里](https://support.huawei.com/enterprise/en/doc/EDOC1100004365/f95c6e68/vxlan-packet-format))
 
-![img](/assert/imgs/docker_net_basic5.png)
+![img](/static/assert/imgs/docker_net_basic5.png)
 
 这种`mac in udp`方式也并不是首创，很多隧道通信协议都采用这种方式。类似`vlan`，`vxlan`通过24位的`vni`来标识子网，解决了空间不足的问题。相同`vni`构成的一个虚拟大二层网络叫`Bridge-Domain`，简称`BD`。`vxlan`需要`vtep`设备做封包和解包。`vtep`设备可以是物理交换机，也可以是虚拟的网络设备。
 
@@ -416,7 +416,7 @@ nat:POSTROUTING:policy:3    IN= OUT=docker0 SRC=172.17.0.1 DST=172.17.0.2
 
 了解了`vxlan`的基本概念，接下来实际操作，实现一个`vxlan`，让两个虚拟机中的Docker容器能够通过`vxlan`通信。大致结构如图
 
-![img](/assert/imgs/docker_net_basic7.png)
+![img](/static/assert/imgs/docker_net_basic7.png)
 
 首先，我们在两个虚拟机新建一个`bridge`类型网络，并让容器使用此网络
 

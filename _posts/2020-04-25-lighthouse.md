@@ -9,11 +9,11 @@ categories: web
 
 `Mu`站点是一个SPA应用。针对这类前端应用，谷歌有一个工具`lighthouse`，可以对其进行评分。一共包含5个方面的评估：性能，访问，最佳实践，SEO和PWA。每个方面包含一系列选项，如果哪些项目评分比较低，它会给出建议，怎么优化这块内容。对`Mu`的优化，主要是依赖这个工具。优化的最终目标是达到全部选项100分，也就是下图的状态
 
-![图片](/assert/imgs/lighthouse/lighthouse.png)
+![图片](/static/assert/imgs/lighthouse/lighthouse.png)
 
 我优化到极致，最后的结果始终差1分，郁郁不欢。一方面我用的是一个香港的服务器，到内地网络延迟就有40多毫秒。此外，加上SPA本身的限制。所以，只能达到这样了，虽然有点不甘心。
 
-![图片](/assert/imgs/lighthouse/lighthouse2.png)
+![图片](/static/assert/imgs/lighthouse/lighthouse2.png)
 
 因为站点比较简单，所以才会这么执着追求满分。如果是一个比较复杂的应用的话，应该是无论如何都达不到满分的状态的。至于为什么，可以慢慢往下看，再做判断。
 
@@ -93,13 +93,13 @@ SPA有一个常见问题，就是首屏渲染。从前面提到的渲染过程�
 
 我的性能评分是99分。主要是差在了`FID`这一个选项上面。
 
-![图片](/assert/imgs/lighthouse/lighthouse3.png)
+![图片](/static/assert/imgs/lighthouse/lighthouse3.png)
 
 什么是`FID`？首次输入延迟。按照谷歌的意思，页面渲染并不是体验的结束。用户和网站能够进行交互的时间，这点也非常关键。`FID`就是度量这个指标的。为什么会发生输入延迟呢？因为渲染出页面后，浏览器主线程忙于其他的工作，没办法响应用户的输入事件。
 
 典型的网页加载时间图
 
-![图片](/assert/imgs/lighthouse/lighthouse4.svg)
+![图片](/static/assert/imgs/lighthouse/lighthouse4.svg)
 
 可以看到，灰色是网络请求资源，黄色是主线程执行资源。浏览器在黄色块接收到用户输入事件时，就会产生延时，和最后响应的时间差，就是`FID`。
 

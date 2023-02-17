@@ -60,11 +60,11 @@ Host dev
 
 输入命令或者点击左下角，选择`Remote-ssh: Connect to Host`，然后选择上一步配置好的`dev`地址。接着，VSCode就自动帮我们连接到远端服务器了。打开上一步clone的目录，就可以愉快的进行开发了。
 
-![图片](/assert/imgs/remotessh.png)
+![图片](/static/assert/imgs/remotessh.png)
 
 左下角可以看到ssh连接的地址。新建一个测试文件，写一点测试代码(VSCode本身的代码编辑特性都可用)
 
-![图片](/assert/imgs/remotessh_1.png)
+![图片](/static/assert/imgs/remotessh_1.png)
 
 我们开发之后，想预览效果，一般会在本地终端起`php -S 127.0.0.1:7788`这样的命令，在浏览器中查看效果。
 
@@ -72,13 +72,13 @@ Host dev
 
 这样，开发在本地，查看效果在本地。真正的本地开发体验。看示例，首先在服务器启动PHP监听
 
-![图片](/assert/imgs/remotessh_2.png)
+![图片](/static/assert/imgs/remotessh_2.png)
 
 然后，选择端口映射，输入`7788`，配置完成，会收到这样的提示，然后，在浏览器中访问，没得问题。
 
-![图片](/assert/imgs/remotessh_3.png)
+![图片](/static/assert/imgs/remotessh_3.png)
 
-![图片](/assert/imgs/remotessh_4.png)
+![图片](/static/assert/imgs/remotessh_4.png)
 
 真的很神奇。做到这一步，我感觉非常惊喜了。不得不说，VSCode这个功能做的也太好了。但是还有最后一步，开发完了，肯定要提交到Git上。因为VSCode集成了Git，可以直接点点鼠标提交刚才修改的文件。然后同步至Github。大功告成。
 

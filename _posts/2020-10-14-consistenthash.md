@@ -18,7 +18,7 @@ categories: deep-in
 
 如图
 
-![img](/assert/imgs/consisthash_1.png)
+![img](/static/assert/imgs/consisthash_1.png)
 
 有3个节点A-100，B-200，C-300。按照它们的hash值从小打到排列，在图位置如上。我们规定，一致性hash算法，返回大于元素的hash值的第一个元素。那么，对于图中元素1，应该返回节点B；对于元素2，应该返回节点C；对于元素3呢？找不到比它更大的节点，此时返回节点A。
 
@@ -28,7 +28,7 @@ categories: deep-in
 
 解决方法是，在环上增加对应的虚拟节点。例如，原先有3个节点，可以增加3个副本，即9个虚拟节点。如下所示
 
-![img](/assert/imgs/consisthash_2.png)
+![img](/static/assert/imgs/consisthash_2.png)
 
 相同节点用相同颜色表示。环上的节点多了，自然分布也会更加均匀。需要注意的是，这里的分布均匀并不是严格的均匀。因为我们分割这个环依赖的是hash算法计算出来的值。因为hash算法的随机性，所以还是会出现一类节点挨在一起的情况。
 

@@ -10,7 +10,7 @@ categories: linux
 
 最新版的`Raspberry PI 3 Model B`加上一些配件一共300来块。配置的话，4核ARM的CPU，1G的内存。这样的配置，就是玩玩了。
 
-![rp](/assert/imgs/rp6.png)
+![rp](/static/assert/imgs/rp6.png)
 
 ## 初始化的东西
 
@@ -74,11 +74,11 @@ sudo apt-get install nginx
 
 这里，根据路由器提供的功能，我们可以很简单的将公网IP映射到树莓派上。首先进行IP和MAC地址绑定，这里防止树莓派IP变化
 
-![rp](/assert/imgs/rp2.png)
+![rp](/static/assert/imgs/rp2.png)
 
 之后，利用DMZ功能，将公网IP绑定到树莓派上
 
-![rp](/assert/imgs/rp3.png)
+![rp](/static/assert/imgs/rp3.png)
 
 操作之后，浏览器打开公网IP。如果访问到"welcome nginx !"，表明配置成功。这也意味着，树莓派近似于一台小服务器了。后面就可以通过域名解析，通过域名访问到我的树莓派上的服务了。
 
@@ -104,7 +104,7 @@ sudo apt-get install nginx
 
 安装好了nextcloud之后，登录后效果是这样的
 
-![rp](/assert/imgs/rp4.png)
+![rp](/static/assert/imgs/rp4.png)
 
 真好。
 
@@ -112,4 +112,4 @@ sudo apt-get install nginx
 
 折腾之后，越发觉得以后要是有条件了，一定要在家里部署一个服务器。
 
-![rp](/assert/imgs/rp7.png)
+![rp](/static/assert/imgs/rp7.png)

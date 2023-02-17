@@ -10,7 +10,7 @@ categories: web
 
 例如，在sso登录授权中，为了安全，会对cookie做一个安全设置。如下是微博m站的cookie信息
 
-![img](/assert/imgs/https_local_1.png)
+![img](/static/assert/imgs/https_local_1.png)
 
 注意后面的`HttpOnly`和`Secure`两个属性。`HttpOnly`是为了限制js脚本获取本地cookie。这个作用是为了防止xss攻击。`secure`属性表明只有在https请求时才会传输。所以这种情况，只有配置https访问，才能够正常的传递cookie信息。实际经测试，在错误的https配置下，这两个属性的cookie还是会传过去。但是，配置自签名https证书用于开发测试还是有必要的。
 

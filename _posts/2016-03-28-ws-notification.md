@@ -9,7 +9,7 @@ categories: web
 
 大致过程如下：
 
-![ws](/assert/imgs/ws_push_main.png)
+![ws](/static/assert/imgs/ws_push_main.png)
 
 整个过程可以简化为:
 

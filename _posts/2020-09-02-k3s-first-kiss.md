@@ -35,7 +35,7 @@ categories: linux
 
 最后，看一下，在`k8s`中，请求是如何到达应用的
 
-![img](/assert/imgs/k3s_1.png)
+![img](/static/assert/imgs/k3s_1.png)
 
 ### 我的部署实践
 
@@ -239,7 +239,7 @@ spec:
 
 因为我通过服务器IP+端口方式可以访问到`Service`了，在这个场景，`Ingress`和传统的Nginx反向代理的方式，区别并不大。都是做域名解析和SSL等。考虑到我的服务器安装了一些其他非容器应用，例如，`MySQL`，`Redis`，`*ray`等。如果通过`Service`将它们映射到`k8s`，再通过`Ingress`代理，这样显得有点多此一举。没有Nginx反代这种传统方式来的方便。所以最终我的服务器部署如下
 
-![img](/assert/imgs/k3s_2.png)
+![img](/static/assert/imgs/k3s_2.png)
 
 ## 最后
 

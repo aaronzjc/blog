@@ -77,7 +77,7 @@ git pull
 
 将flask应用跑起来之后，到Gogs仓库配置webhook到这个URL就可以了
 
-![图片]({{ site.url }}/assert/imgs/webhooks_1.png)
+![图片]({{ site.url }}/static/assert/imgs/webhooks_1.png)
 
 至此，就大功告成了我们的Git服务搭建。
 

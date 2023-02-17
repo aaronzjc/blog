@@ -11,7 +11,7 @@ categories: linux
 
 在没有k8s时，公司通常采用EFK或者ELK套件进行日志收集。大致架构如图
 
-![img](/assert/imgs/logstack_1.png)
+![img](/static/assert/imgs/logstack_1.png)
 
 首先，将业务日志写到服务器指定的目录，然后，配置一个日志收集程序，将文件发到队列。也有直接代码里发送到队列的。然后，有一个格式化或者过滤器读取队列的日志，经过预处理后，存入到ES集群。基本的日志架构都是如此。
 
@@ -19,7 +19,7 @@ k8s中，收集应用日志的方式也大体如此。有两种方案，一种�
 
 我采用的是sidecar模式来收集应用日志。日志技术栈采用`Fluent-bit`+`Loki`+`Grafana`套件。毕竟，要玩就玩新的嘛。整体架构如图
 
-![img](/assert/imgs/logstack_2.png)
+![img](/static/assert/imgs/logstack_2.png)
 
 为什么采用这套架构呢？因为我的服务器配置很垃圾，应用也很简单，所以按照自己的喜好，肯定是选择最轻量级的方案了。`Fluent-bit`是轻量级的`Fluentd`采集器，`Loki`作为日志存储和索引，`Grafana`用于检索日志。
 
@@ -147,11 +147,11 @@ spec:
 
 按照如上的方式，部署成功后，我们就可以查看我们的日志了。首先配置好`grafana`的数据源，然后，在检索中按照`LokiQL`语法进行检索，结果如下
 
-![img](/assert/imgs/logstack_3.png)
+![img](/static/assert/imgs/logstack_3.png)
 
 和`kibana`一样，`grafaba`不仅仅支持日志检索，还支持日志的聚合图表展示。我们添加一个面板，配置好图表后，就可以得到一个漂亮的监控了
 
-![img](/assert/imgs/logstack_4.png)
+![img](/static/assert/imgs/logstack_4.png)
 
 如上。我们就在k8s中，实践了日志的收集，展示，监控这些基本操作。
 

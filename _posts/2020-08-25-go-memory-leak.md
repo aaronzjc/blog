@@ -6,11 +6,11 @@ categories: golang
 ---
 自从`Mu`做了一次升级后，出现一个奇怪的问题。服务器每隔一两天，就会出现CPU占用率100%和磁盘读写100%，最后导致服务器挂了。第一反应是，CPU和磁盘负载高，肯定是运行了什么计算和IO很重的程序。但是服务器并没有这种服务，所以很懵。
 
-![img](/assert/imgs/memleak/3.png)
+![img](/static/assert/imgs/memleak/3.png)
 
 由于服务器负载满了的时候无法ssh登录，为了定位问题，于是写了一个cron脚本，每5分钟记录`top`命令的情况。最终发现了一些端倪。
 
-![img](/assert/imgs/memleak/0.png)
+![img](/static/assert/imgs/memleak/0.png)
 
 图片显示`commander`占用内存比较高，过段时间再查看，甚至达到了20%以上。我是2G内存，这个占用就比较离谱了。所以果断得出结论是自己的代码出现了内存泄露。
 
@@ -50,11 +50,11 @@ func main() {
 
 这时候，浏览器中打开`http://127.0.0.1:6060/debug/pprof/`，可以看到如下的页面
 
-![img](/assert/imgs/memleak/1.png)
+![img](/static/assert/imgs/memleak/1.png)
 
 一眼就看出这个协程的数量多少是有点问题。然后刷新页面，发现这个协程的数量还在不断的增长。点进去就发现问题所在了
 
-![img](/assert/imgs/memleak/2.png)
+![img](/static/assert/imgs/memleak/2.png)
 
 基本上都是Redis相关的协程。到这一步大致就能反应过来了，肯定是代码里面使用了Redis连接，没有Close的原因。最后也确实如此。至此，我们就使用`net/http/pprof`包定位了内存泄露的问题。
 

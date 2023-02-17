@@ -14,7 +14,7 @@ categories: skills
 
 首先，找到自己想要添加的歌曲，生成外链播放器
 
-![播放器](/assert/imgs/netease.png)
+![播放器](/static/assert/imgs/netease.png)
 
 
 查看外链播放器，发现是一个iframe标签。所以，只用在文章中嵌入iframe标签即可。这里可以设置播放器自动播放还有尺寸大小。

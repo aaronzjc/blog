@@ -8,19 +8,19 @@ categories: skills
 
 首先，打开`charles`，手机连上代理看一下请求。惊奇发现，这些关键接口居然是不https的，喜出望外。
 
-![图片](/assert/imgs/changba_0.png)
+![图片](/static/assert/imgs/changba_0.png)
 
 这一大坨都是接口请求，接口名字也很含糊。一个一个查看请求结果，找到这首歌的详情接口，复制响应信息到`json.cn`。
 
-![图片](/assert/imgs/changba_1.png)
+![图片](/static/assert/imgs/changba_1.png)
 
 找到作者的ID或者首页地址。这才是我们要的信息。唱吧官网是没有入口找到作者的首页的，前面的铺垫都是为了找到这个首页。接下来，进入作者首页，就可以看到她的歌曲列表了。歌曲支持网页在线播放。
 
-![图片](/assert/imgs/changba_2.png)
+![图片](/static/assert/imgs/changba_2.png)
 
 进入播放页，打开网页控制台，查看请求。然后点击播放
 
-![图片](/assert/imgs/changba_3.png)
+![图片](/static/assert/imgs/changba_3.png)
 
 这样就找到这首歌了。点击这首歌的请求，在新标签页打开，就下载到本地了。
 

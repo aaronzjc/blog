@@ -14,13 +14,13 @@ categories: web
 
 轮询是最简单粗暴的一种方式。原理就是浏览器每隔一段时间，发送请求询问服务器。服务器进行查询，是否有数据，无论有么有数据都返回给客户端结果。如下图：
 
-![polling](/assert/imgs/comet_sse_1.png)
+![polling](/static/assert/imgs/comet_sse_1.png)
 
 ## Ajax长轮询
 
 长轮询就是在上面的轮询之上进行了改善。当浏览器发送一个请求之后，服务器不立刻返回，而是阻塞这个请求。阻塞的过程中，服务器不断检查是否有新的数据，如果有新的数据，那服务器马上返回这个数据，请求结束。如果服务器达到一个设定的阻塞时间都没有新的数据，则也返回失败。客户端收到响应后，再次发送一个请求。
 
-![long-polling](/assert/imgs/comet_sse_2.png)
+![long-polling](/static/assert/imgs/comet_sse_2.png)
 
 这种方式相比之上的好处是减少了发送的请求数，但是，依然有很多是无用的请求。缺点也明显，就是阻塞服务器占用了资源。
 
@@ -32,7 +32,7 @@ categories: web
 
 最近才了解到这个东西。十分强大，方便。可以解决我们上面的大部分需求了。基于这个技术，服务器就可以通过发送消息的形式不断的向客户端吐数据了。页面加载后，执行JS，实例化一个EventSource对象，请求后台的页面。然后，后台就可以接受这个请求，源源不断发送数据了。
 
-![long-polling](/assert/imgs/comet_sse_3.png)
+![long-polling](/static/assert/imgs/comet_sse_3.png)
 
 下面是一个小例子：
 
@@ -83,7 +83,7 @@ for ($i=10; $i>2; $i--)
 
 websocket实现了客户端和服务器的双工通信。也就是建立连接之后，服务器和客户端可以相互发送数据。HTTP 2.0中，websocket也得到支持。
 过程是，页面执行JS，发起一个websocket连接请求。经过三次握手之后，服务器和客户端建立连接。然后就可以通信了。和平常socket通信一样的过程。
-![long-polling](/assert/imgs/comet_sse_4.png)
+![long-polling](/static/assert/imgs/comet_sse_4.png)
 
 ## 最后
 

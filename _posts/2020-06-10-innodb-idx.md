@@ -56,13 +56,13 @@ MySQL的表数据文件通常放在`/var/lib/mysql/table_name`里面，后缀是
 
 `0xc000`的位置，即为数据页开始的地方。观察下图
 
-![图片](/assert/imgs/innodb_1.png)
+![图片](/static/assert/imgs/innodb_1.png)
 
 小框标记的16进制数，转成10进制，即是我们表中的主键值。后面跟着的一串就是`(name, age, phone)`字段的值，可以看到，就是简单的顺序存储。主键索引没有什么复杂的了。
 
 继续往下找，可以找到非聚簇索引存储的值
 
-![图片](/assert/imgs/innodb_2.png)
+![图片](/static/assert/imgs/innodb_2.png)
 
 和聚簇索引类似的存储结构。不过这时候键是`(name, phone)`两个字段的拼接。小红框的值转成10进制，就是对应的主键ID值。所以，联合索引在进行查找的时候，确实按照字段的顺序来的。
 

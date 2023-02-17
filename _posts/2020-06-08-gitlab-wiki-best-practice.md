@@ -29,7 +29,7 @@ git clone ${WIKI代码库}.wiki.git
 
 一个标准的`wiki`目录结构如下
 
-![图片](/assert/imgs/gitlab_wiki_1.png)
+![图片](/static/assert/imgs/gitlab_wiki_1.png)
 
 Gitlab左边菜单点击`wiki`菜单项指向的就是`home.md`。
 

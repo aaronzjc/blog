@@ -44,7 +44,7 @@ while True:
 ```
 运行结果
 
-![Python Http]({{site.baseurl}}/assert/imgs/from_http_1.png)
+![Python Http]({{site.baseurl}}/static/assert/imgs/from_http_1.png)
 
 上面的示例只是简单的构造了一个简单响应。实际中的服务器程序还需要对请求进行分析，处理多个连接等。复杂的多。服务器的简单介绍就到此为止。
 
@@ -56,18 +56,18 @@ while True:
 ### CGI
 CGI(Common Gateway Interface)通用网关接口。描述了外部应用程序与服务器通信的标准。CGI允许Web服务器调用外部的应用程序执行，并将执行结果返回给服务器。具体执行的流程是，外部请求请求CGI脚本，Web服务器收到相应的请求之后，去检查cgi目录是否存在对应的CGI脚本，如果存在，则启动一个外部应用程序进程来执行这个脚本，脚本执行结束，返回数据，进程关闭。因为语言无关性，所以任何后端语言程序只要符合CGI标准，都可以作为CGI脚本。显然，某些方面来看，因为需要反复启动外部应用程序进程，所以CGI效率应该是很低的。但是也有其应用方面，如果是密集型计算，可以用一些静态语言，像C来开发CGI脚本，性能就是其他语言无法媲美的。[Apache CGI文档说明](https://httpd.apache.org/docs/2.2/howto/cgi.html)
 
-![CGI]({{site.baseurl}}/assert/imgs/from_http_2.jpg)
+![CGI]({{site.baseurl}}/static/assert/imgs/from_http_2.jpg)
 
 ### mod_php方式
 这种方式是平常配置LAMP最常见的方式。一般使用这种方式时，需要配置PHP，以及PHP处理的后缀名。其思路是将PHP解释器集成至Apache服务器中，作为服务器的一部分来运行。当启动服务器的时候，预先加载PHP的运行环境。然后，服务器接收到对于PHP脚本的请求时，Apache调用PHP解释器来对脚本进行解释，运行，并返回相应的结果。
 
-![mod_php]({{site.baseurl}}/assert/imgs/from_http_3.jpg)
+![mod_php]({{site.baseurl}}/static/assert/imgs/from_http_3.jpg)
 
 如上是PHP和Apache协作的两种方式。服务器和后端程序之间的通信就是如此。这里有一个[资源](http://www.slideshare.net/aimeemaree/a-look-at-fastcgi-modphp-architecture)讲解了几种方式的流程，十分的清晰。上述图片来源自此。
 
 插播一张图，下面的图是PHP语言的核心架构。结合上面的理解，也有一个更加清晰的认识了。
 
-![php_arch]({{site.baseurl}}/assert/imgs/from_http_4.png)
+![php_arch]({{site.baseurl}}/static/assert/imgs/from_http_4.png)
 
 注意其中的SAPI(Server Application Programming Interface 服务端编程接口)部分。SAPI通过一系列函数，实现了PHP与外围数据的交互。
 

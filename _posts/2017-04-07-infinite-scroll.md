@@ -24,7 +24,7 @@ categories: web
 
 简单说明下，其中用到的三个高度值，具体指的是啥子高度
 
-![图片](/assert/imgs/is.jpg)
+![图片](/static/assert/imgs/is.jpg)
 
 简要说明
 
