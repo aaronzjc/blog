@@ -1,4 +1,4 @@
-FROM jekyll/jekyll:4.3.0 as build
+FROM jekyll/jekyll:latest as build
 RUN mkdir -p /dist/_site
 COPY . /dist
 WORKDIR /dist
